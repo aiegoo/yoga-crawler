@@ -1,0 +1,79 @@
+[
+  {
+    "source": "static",
+    "type": "national_federation",
+    "name": "대한요가회",
+    "location": "Seoul",
+    "cert_level": "국가공인",
+    "country": "KR",
+    "website": "http://www.koreayoga.or.kr",
+    "member_count": null,
+    "crawled_at": "2026-05-19T21:15:47.852089+00:00"
+  },
+  {
+    "source": "static",
+    "type": "national_association",
+    "name": "한국요가협회",
+    "location": "Seoul",
+    "cert_level": "민간",
+    "country": "KR",
+    "website": "https://www.koreayogaassociation.com",
+    "member_count": null,
+    "crawled_at": "2026-05-19T21:15:47.852089+00:00"
+  },
+  {
+    "source": "static",
+    "type": "international_alliance",
+    "name": "Yoga Alliance (International)",
+    "location": "USA",
+    "cert_level": "RYT-200/500/E-RYT",
+    "country": "US",
+    "website": "https://www.yogaalliance.org",
+    "member_count": null,
+    "crawled_at": "2026-05-19T21:15:47.852089+00:00"
+  },
+  {
+    "source": "static",
+    "type": "national_federation",
+    "name": "생활체육요가연합회",
+    "location": "Seoul",
+    "cert_level": "생활체육",
+    "country": "KR",
+    "website": "",
+    "member_count": null,
+    "crawled_at": "2026-05-19T21:15:47.852089+00:00"
+  },
+  {
+    "source": "static",
+    "type": "national_association",
+    "name": "한국아쉬탕가요가협회 (KAYA)",
+    "location": "Seoul",
+    "cert_level": "아쉬탕가",
+    "country": "KR",
+    "website": "",
+    "member_count": null,
+    "crawled_at": "2026-05-19T21:15:47.852089+00:00"
+  },
+  {
+    "source": "static",
+    "type": "international_alliance",
+    "name": "Iyengar Yoga Association of Korea",
+    "location": "Seoul",
+    "cert_level": "Iyengar",
+    "country": "KR",
+    "website": "",
+    "member_count": null,
+    "crawled_at": "2026-05-19T21:15:47.852089+00:00"
+  },
+  {
+    "source": "static",
+    "type": "certification_body",
+    "name": "YACEP (Yoga Alliance Continuing Education Provider)",
+    "location": "USA",
+    "cert_level": "YACEP",
+    "country": "US",
+    "website": "https://www.yogaalliance.org/yacep",
+    "member_count": null,
+    "crawled_at": "2026-05-19T21:15:47.852089+00:00"
+  }
+]
