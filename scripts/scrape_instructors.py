@@ -50,6 +50,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import os
+
 import httpx
 from bs4 import BeautifulSoup
 
@@ -80,6 +82,19 @@ YA_HEADERS = {
     ),
     "Accept-Language": "en-US,en;q=0.9",
 }
+
+
+# Naver Local Search API (fallback for Korean instructors)
+NAVER_LOCAL_URL = "https://openapi.naver.com/v1/search/local.json"
+NAVER_CLIENT_ID = os.environ.get("NAVER_CLIENT_ID", "")
+NAVER_CLIENT_SECRET = os.environ.get("NAVER_CLIENT_SECRET", "")
+
+KR_CITIES = [
+    "서울", "부산", "대구", "인천", "광주", "대전", "수원", "울산",
+    "성남", "고양", "용인", "창원", "청주", "전주", "안산", "안양",
+]
+
+INSTRUCTOR_KEYWORDS = ["요가강사", "요가코치", "요가선생님"]
 
 # Certification tier weights used in trust score calculation
 CERT_WEIGHT: dict[str, float] = {
@@ -406,10 +421,12 @@ def write_sql(instructors: list[dict], path: Path) -> None:
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--source", choices=["yogaalliance", "instagram", "all"],
-                   default="yogaalliance")
+    p.add_argument("--source", choices=["yogaalliance", "instagram", "naver", "all"],
+                   default="naver")
     p.add_argument("--all", action="store_true",
                    help="Equivalent to --source all")
+    p.add_argument("--cities", default="",
+                   help="Comma-separated Korean city names (default: all 16)")
     p.add_argument("--city", default="Seoul",
                    help="City for Yoga Alliance directory search (default: Seoul)")
     p.add_argument("--pages", type=int, default=2,
@@ -446,6 +463,12 @@ def main() -> None:
         ya_results = scrape_yoga_alliance(args.city, args.pages, args.delay)
         instructors.extend(ya_results)
         log.info("Yoga Alliance: %d instructors collected", len(ya_results))
+
+    # Naver Local Search (Korean instructors)
+    if source in ("naver", "all") and not args.input:
+        cities = [c.strip() for c in args.cities.split(",") if c.strip()] or None
+        naver_results = scrape_naver_instructors(cities=cities, delay=args.delay)
+        instructors.extend(naver_results)
 
     # Instagram enrichment
     handles = [h.strip() for h in args.handles.split(",") if h.strip()]
