@@ -326,6 +326,75 @@ def _infer_specialties_from_bio(bio: str) -> list[str]:
     return [tag for tag, terms in keywords.items() if any(t in bio_lower for t in terms)]
 
 
+
+# ── Naver Local Search instructor scraper ────────────────────────────────────
+
+def scrape_naver_instructors(cities=None, delay=1.5):
+    """Search Naver Local API for individual yoga instructors in Korean cities."""
+    if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
+        log.warning("NAVER_CLIENT_ID/SECRET not set — skipping Naver instructor search")
+        return []
+
+    cities = cities or KR_CITIES
+    results = []
+    seen_ids = set()
+    headers = {
+        "X-Naver-Client-Id": NAVER_CLIENT_ID,
+        "X-Naver-Client-Secret": NAVER_CLIENT_SECRET,
+    }
+    client = httpx.Client(headers=headers, timeout=10, follow_redirects=True)
+
+    for city in cities:
+        for keyword in INSTRUCTOR_KEYWORDS:
+            query = f"{city} {keyword}"
+            params = {"query": query, "display": 5, "start": 1, "sort": "comment"}
+            try:
+                resp = client.get(NAVER_LOCAL_URL, params=params)
+                resp.raise_for_status()
+                items = resp.json().get("items", [])
+            except Exception as exc:
+                log.warning("Naver '%s' error: %s", query, exc)
+                continue
+            log.info("Naver '%s' → %d items", query, len(items))
+            for item in items:
+                name = re.sub(r"<[^>]+>", "", item.get("title", "")).strip()
+                if not name:
+                    continue
+                inst_id = re.sub(r"[^a-z0-9]+", "-", (name + "-" + city).lower()).strip("-")
+                if inst_id in seen_ids:
+                    continue
+                seen_ids.add(inst_id)
+                desc = item.get("description", "") or ""
+                addr = item.get("roadAddress") or item.get("address") or ""
+                results.append({
+                    "instructor_id":       inst_id,
+                    "full_name":           name,
+                    "bio":                 desc or None,
+                    "certification_level": None,
+                    "yoga_alliance_id":    None,
+                    "lineage_school":      None,
+                    "lineage_depth":       0,
+                    "city":                city,
+                    "country":             "KR",
+                    "address":             addr or None,
+                    "telephone":           item.get("telephone") or None,
+                    "naver_link":          item.get("link") or None,
+                    "instagram_handle":    None,
+                    "instagram_followers": None,
+                    "specialties":         _infer_specialties_from_bio(desc),
+                    "avg_rating":          None,
+                    "review_count":        0,
+                    "data_source":         "naver_local",
+                    "scraped_at":          datetime.now(timezone.utc).isoformat(),
+                })
+            time.sleep(random.uniform(0.4, delay))
+        time.sleep(random.uniform(0.2, 0.5))
+
+    client.close()
+    log.info("Naver instructor search: %d unique instructors", len(results))
+    return results
+
+
 # ── Trust score calculation ───────────────────────────────────────────────────
 
 def compute_trust_score(instructor: dict) -> float:
