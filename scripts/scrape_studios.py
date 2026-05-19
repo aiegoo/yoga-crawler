@@ -167,7 +167,6 @@ def kakao_search(query: str, delay: float = 1.0, dry_run: bool = False) -> list[
         while True:
             params = {
                 "query": query,
-                "category_group_code": "SW8",  # 스포츠,레저
                 "size": 15,
                 "page": page,
             }
@@ -390,7 +389,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Allow --out-dir to override the module-level defaults
+    out_dir  = args.out_dir
+    out_json = out_dir / "studios_raw.json"
+    out_sql  = out_dir / "studios_seed.sql"
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     # Build query list: keyword × city (or district for Seoul)
     cities = list(CITIES.keys()) if args.all_cities else args.cities
@@ -422,16 +425,16 @@ def main() -> None:
     log.info("After dedup: %d", len(deduped))
 
     # Write JSON
-    OUT_JSON.write_text(json.dumps(deduped, ensure_ascii=False, indent=2), encoding="utf-8")
-    log.info("Wrote %s", OUT_JSON)
+    out_json.write_text(json.dumps(deduped, ensure_ascii=False, indent=2), encoding="utf-8")
+    log.info("Wrote %s", out_json)
 
     # Write SQL
-    OUT_SQL.write_text(to_sql(deduped), encoding="utf-8")
-    log.info("Wrote %s", OUT_SQL)
+    out_sql.write_text(to_sql(deduped), encoding="utf-8")
+    log.info("Wrote %s", out_sql)
 
     # Optional S3 sync
     if args.s3_sync and not args.dry_run:
-        s3_sync(OUT_DIR, S3_BUCKET)
+        s3_sync(out_dir, S3_BUCKET)
 
     log.info("Done — %d studios saved", len(deduped))
 
