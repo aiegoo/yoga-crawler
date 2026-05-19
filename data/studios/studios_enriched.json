@@ -9,7 +9,7 @@
     "place_url": "https://www.instagram.com/healnessstudio",
     "phone": null,
     "category": "스포츠시설>필라테스",
-    "enriched_at": "2026-05-19T13:37:21.343156+00:00",
+    "enriched_at": "2026-05-19T21:06:53.172759+00:00",
     "geohash": "wydm90",
     "neighborhood": "용산구",
     "neighborhood_tags": [
@@ -40,7 +40,7 @@
     "place_url": "https://smartstore.naver.com/onyogastudio",
     "phone": null,
     "category": "스포츠시설>요가원",
-    "enriched_at": "2026-05-19T13:37:25.317926+00:00",
+    "enriched_at": "2026-05-19T21:06:56.591146+00:00",
     "geohash": "wydm7k",
     "neighborhood": "강남구",
     "neighborhood_tags": [
@@ -71,7 +71,7 @@
     "place_url": "https://blog.naver.com/goodhabit_yeonnam",
     "phone": null,
     "category": "스포츠,오락>스포츠시설",
-    "enriched_at": "2026-05-19T13:37:29.151587+00:00",
+    "enriched_at": "2026-05-19T21:06:59.618787+00:00",
     "geohash": "wydm8n",
     "neighborhood": "마포구",
     "neighborhood_tags": [
@@ -88,6 +88,891 @@
       },
       "search_vector_payload": {
         "raw_chunk": "좋은습관 PT STUDIO 연남 in 마포구. Category: 스포츠,오락>스포츠시설. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 4,
+    "name": "아스테 요가 필라테스 스튜디오",
+    "road_address": "서울특별시 동대문구 장한로 73 2층",
+    "address": "서울특별시 동대문구 장안동 375-1 2층",
+    "lat": 37.5675833,
+    "lng": 127.0683871,
+    "place_url": null,
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:03.127427+00:00",
+    "geohash": "wydmew",
+    "neighborhood": "동대문구",
+    "neighborhood_tags": [
+      "동대문구"
+    ],
+    "rag_payload": {
+      "studio_id": "아스테-요가-필라테스-스튜디오-서울특별시동대문구",
+      "geo": {
+        "lat": 37.5675833,
+        "lon": 127.0683871,
+        "geohash": "wydmew"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "아스테 요가 필라테스 스튜디오 in 동대문구. Category: 스포츠시설>요가원.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 5,
+    "name": "에쏘르 번지요가 스튜디오 성신여대점",
+    "road_address": "서울특별시 성북구 동소문로25길 9 휴림빌딩 2층",
+    "address": "서울특별시 성북구 동선동4가 127 휴림빌딩 2층",
+    "lat": 37.5947322,
+    "lng": 127.018301,
+    "place_url": "https://www.instagram.com/essor.studio_ss",
+    "phone": null,
+    "category": "스포츠시설>필라테스",
+    "enriched_at": "2026-05-19T21:07:06.041603+00:00",
+    "geohash": "wydmf7",
+    "neighborhood": "성북구",
+    "neighborhood_tags": [
+      "성북구"
+    ],
+    "instagram": "https://instagram.com/rsrc.php",
+    "rag_payload": {
+      "studio_id": "에쏘르-번지요가-스튜디오-성신여대점-서울특별시성북구",
+      "geo": {
+        "lat": 37.5947322,
+        "lon": 127.018301,
+        "geohash": "wydmf7"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "에쏘르 번지요가 스튜디오 성신여대점 in 성북구. Category: 스포츠시설>필라테스.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 6,
+    "name": "바른결요가 중계",
+    "road_address": "서울특별시 노원구 한글비석로 232 유경데파트 6층 607호",
+    "address": "서울특별시 노원구 중계동 364-17 유경데파트 6층 607호",
+    "lat": 37.6483859,
+    "lng": 127.0769434,
+    "place_url": "http://pf.kakao.com/_tqxbIxl",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:09.413980+00:00",
+    "geohash": "wydq5t",
+    "neighborhood": "노원구",
+    "neighborhood_tags": [
+      "노원구"
+    ],
+    "website": "https://schema.org",
+    "rag_payload": {
+      "studio_id": "바른결요가-중계-서울특별시노원구",
+      "geo": {
+        "lat": 37.6483859,
+        "lon": 127.0769434,
+        "geohash": "wydq5t"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "바른결요가 중계 in 노원구. Category: 스포츠시설>요가원. Website: https://schema.org.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 7,
+    "name": "아마비아요가 홍대점",
+    "road_address": "서울특별시 마포구 양화로 166 미래프라자 12층",
+    "address": "서울특별시 마포구 동교동 165-1 미래프라자 12층",
+    "lat": 37.5567325,
+    "lng": 126.9241712,
+    "place_url": "https://www.instagram.com/amaviayoga_hd/",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:12.729498+00:00",
+    "geohash": "wydm8h",
+    "neighborhood": "마포구",
+    "neighborhood_tags": [
+      "마포구"
+    ],
+    "instagram": "https://instagram.com/rsrc.php",
+    "rag_payload": {
+      "studio_id": "아마비아요가-홍대점-서울특별시마포구",
+      "geo": {
+        "lat": 37.5567325,
+        "lon": 126.9241712,
+        "geohash": "wydm8h"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "아마비아요가 홍대점 in 마포구. Category: 스포츠시설>요가원.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 8,
+    "name": "아마비아요가 서대문점",
+    "road_address": "서울특별시 서대문구 통일로 127 충정로 우체국 건물 3층",
+    "address": "서울특별시 서대문구 충정로2가 8-2 충정로 우체국 건물 3층",
+    "lat": 37.5659366,
+    "lng": 126.965969,
+    "place_url": "https://blog.naver.com/maymayner/224281165571",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:16.108072+00:00",
+    "geohash": "wydm9n",
+    "neighborhood": "서대문구",
+    "neighborhood_tags": [
+      "서대문구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "rag_payload": {
+      "studio_id": "아마비아요가-서대문점-서울특별시서대문구",
+      "geo": {
+        "lat": 37.5659366,
+        "lon": 126.965969,
+        "geohash": "wydm9n"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "아마비아요가 서대문점 in 서대문구. Category: 스포츠시설>요가원. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 9,
+    "name": "아마비아요가 당산점",
+    "road_address": "서울특별시 영등포구 선유로54길 14 소미더클래스한강 101동 지하1층",
+    "address": "서울특별시 영등포구 당산동6가 341-1 소미더클래스한강 101동 지하1층",
+    "lat": 37.5356996,
+    "lng": 126.899709,
+    "place_url": "https://www.instagram.com/amavia__ds/",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:19.463528+00:00",
+    "geohash": "wydjx9",
+    "neighborhood": "영등포구",
+    "neighborhood_tags": [
+      "영등포구"
+    ],
+    "instagram": "https://instagram.com/rsrc.php",
+    "rag_payload": {
+      "studio_id": "아마비아요가-당산점-서울특별시영등포구",
+      "geo": {
+        "lat": 37.5356996,
+        "lon": 126.899709,
+        "geohash": "wydjx9"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "아마비아요가 당산점 in 영등포구. Category: 스포츠시설>요가원.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 10,
+    "name": "아메리카요가 용산점",
+    "road_address": "서울특별시 용산구 새창로 213-12 현대하이엘 2층 아메리카요가용산점(파리바게트 옆 건물)",
+    "address": "서울특별시 용산구 한강로2가 2-36 현대하이엘 2층 아메리카요가용산점(파리바게트 옆 건물)",
+    "lat": 37.5304923,
+    "lng": 126.9680375,
+    "place_url": "https://blog.naver.com/ayoyongsan",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:22.711300+00:00",
+    "geohash": "wydm90",
+    "neighborhood": "용산구",
+    "neighborhood_tags": [
+      "용산구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/americayoga_yongsan",
+    "rag_payload": {
+      "studio_id": "아메리카요가-용산점-서울특별시용산구",
+      "geo": {
+        "lat": 37.5304923,
+        "lon": 126.9680375,
+        "geohash": "wydm90"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "아메리카요가 용산점 in 용산구. Category: 스포츠시설>요가원. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 11,
+    "name": "바운드짐 낙성대역점",
+    "road_address": "서울특별시 관악구 남부순환로 1904 지하1층 제비101호",
+    "address": "서울특별시 관악구 봉천동 1661-4 지하1층 제비101호",
+    "lat": 37.4778876,
+    "lng": 126.9607001,
+    "place_url": "https://link.inpock.co.kr/boundgym",
+    "phone": null,
+    "category": "스포츠시설>헬스장",
+    "enriched_at": "2026-05-19T21:07:26.074450+00:00",
+    "geohash": "wydm1n",
+    "neighborhood": "관악구",
+    "neighborhood_tags": [
+      "관악구"
+    ],
+    "website": "https://d13k46lqgoj3d6.cloudfront.net/2025/11/13/2025-11-13-1763009168447.avif",
+    "rag_payload": {
+      "studio_id": "바운드짐-낙성대역점-서울특별시관악구",
+      "geo": {
+        "lat": 37.4778876,
+        "lon": 126.9607001,
+        "geohash": "wydm1n"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "바운드짐 낙성대역점 in 관악구. Category: 스포츠시설>헬스장. Website: https://d13k46lqgoj3d6.cloudfront.net/2025/11/13/2025-11-13-1763009168447.avif.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 12,
+    "name": "스포애니 응암역점",
+    "road_address": "서울특별시 은평구 연서로 9 센타폴리스 B1층",
+    "address": "서울특별시 은평구 역촌동 85-12 센타폴리스 B1층",
+    "lat": 37.5999839,
+    "lng": 126.9156537,
+    "place_url": "https://www.spoany.co.kr/branch_view.php?idx=93#pageTop",
+    "phone": null,
+    "category": "스포츠시설>헬스장",
+    "enriched_at": "2026-05-19T21:07:29.427565+00:00",
+    "geohash": "wydmbh",
+    "neighborhood": "은평구",
+    "neighborhood_tags": [
+      "은평구"
+    ],
+    "instagram": "https://instagram.com/spoany_official",
+    "facebook": "https://facebook.com/spoany3924",
+    "youtube": "https://youtube.com/channel/UC3BAqX_rjUHt_Gm7eo27zBA",
+    "website": "https://www.spoany.co.kr/branch_view.php",
+    "rag_payload": {
+      "studio_id": "스포애니-응암역점-서울특별시은평구",
+      "geo": {
+        "lat": 37.5999839,
+        "lon": 126.9156537,
+        "geohash": "wydmbh"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "스포애니 응암역점 in 은평구. Category: 스포츠시설>헬스장. Website: https://www.spoany.co.kr/branch_view.php.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 13,
+    "name": "짐스타 낙성대",
+    "road_address": "서울특별시 관악구 남부순환로 1926 경동제약빌딩 지하2층",
+    "address": "서울특별시 관악구 봉천동 1659-5 경동제약빌딩 지하2층",
+    "lat": 37.4768257,
+    "lng": 126.9631587,
+    "place_url": "https://blog.naver.com/gymstar_fitness",
+    "phone": null,
+    "category": "스포츠시설>헬스장",
+    "enriched_at": "2026-05-19T21:07:31.390373+00:00",
+    "geohash": "wydm1n",
+    "neighborhood": "관악구",
+    "neighborhood_tags": [
+      "관악구",
+      "경동"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/j.stargym_junho",
+    "rag_payload": {
+      "studio_id": "짐스타-낙성대-서울특별시관악구",
+      "geo": {
+        "lat": 37.4768257,
+        "lon": 126.9631587,
+        "geohash": "wydm1n"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "짐스타 낙성대 in 관악구. Category: 스포츠시설>헬스장. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 14,
+    "name": "요가라테스",
+    "road_address": "서울특별시 성동구 마조로5길 5 4층 요가라테스 (한양대점)",
+    "address": "서울특별시 성동구 행당동 19-48 4층 요가라테스 (한양대점)",
+    "lat": 37.5599445,
+    "lng": 127.0405483,
+    "place_url": "https://blog.naver.com/yogalatesh",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:34.540947+00:00",
+    "geohash": "wydmdv",
+    "neighborhood": "성동구",
+    "neighborhood_tags": [
+      "성동구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/miso_pilates",
+    "rag_payload": {
+      "studio_id": "요가라테스-서울특별시성동구",
+      "geo": {
+        "lat": 37.5599445,
+        "lon": 127.0405483,
+        "geohash": "wydmdv"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "요가라테스 in 성동구. Category: 스포츠시설>요가원. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 15,
+    "name": "더플라잉핫요가 바레 &amp; 필라테스",
+    "road_address": "서울특별시 강서구 강서로 43 도양라비앙타워",
+    "address": "서울특별시 강서구 화곡동 343-52 도양라비앙타워",
+    "lat": 37.5316304,
+    "lng": 126.8465317,
+    "place_url": "https://www.instagram.com/theflyinghotyoga",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:37.387992+00:00",
+    "geohash": "wydjw2",
+    "neighborhood": "강서구",
+    "neighborhood_tags": [
+      "강서구"
+    ],
+    "instagram": "https://instagram.com/rsrc.php",
+    "rag_payload": {
+      "studio_id": "더플라잉핫요가-바레-&amp;-필라테스-서울특별시강서구",
+      "geo": {
+        "lat": 37.5316304,
+        "lon": 126.8465317,
+        "geohash": "wydjw2"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "더플라잉핫요가 바레 &amp; 필라테스 in 강서구. Category: 스포츠시설>요가원.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 16,
+    "name": "조성정아쉬탕가요가",
+    "road_address": "서울특별시 성북구 종암로 166",
+    "address": "서울특별시 성북구 하월곡동 90-723",
+    "lat": 37.6047614,
+    "lng": 127.0320773,
+    "place_url": "https://youtube.com/@user-pz5js8gz2z?si=qhHwhtzB7iEL6FRi",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:40.607832+00:00",
+    "geohash": "wydmft",
+    "neighborhood": "성북구",
+    "neighborhood_tags": [
+      "성북구"
+    ],
+    "rag_payload": {
+      "studio_id": "조성정아쉬탕가요가-서울특별시성북구",
+      "geo": {
+        "lat": 37.6047614,
+        "lon": 127.0320773,
+        "geohash": "wydmft"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "조성정아쉬탕가요가 in 성북구. Category: 스포츠시설>요가원.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 17,
+    "name": "요가안",
+    "road_address": "서울특별시 관악구 은천로 97 공원빌딩 5층",
+    "address": "서울특별시 관악구 봉천동 498-7 공원빌딩 5층",
+    "lat": 37.4871246,
+    "lng": 126.9461766,
+    "place_url": "https://blog.naver.com/yogaanyogaan",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:43.942070+00:00",
+    "geohash": "wydm28",
+    "neighborhood": "관악구",
+    "neighborhood_tags": [
+      "관악구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/_yogaan_",
+    "rag_payload": {
+      "studio_id": "요가안-서울특별시관악구",
+      "geo": {
+        "lat": 37.4871246,
+        "lon": 126.9461766,
+        "geohash": "wydm28"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "요가안 in 관악구. Category: 스포츠시설>요가원. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 18,
+    "name": "요가아샤",
+    "road_address": "서울특별시 동작구 국사봉1길 12 진선빌딩 4층",
+    "address": "서울특별시 동작구 상도동 323-17 진선빌딩 4층",
+    "lat": 37.4987864,
+    "lng": 126.9292604,
+    "place_url": "https://pf.kakao.com/_dKZxgj",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:46.983690+00:00",
+    "geohash": "wydm26",
+    "neighborhood": "동작구",
+    "neighborhood_tags": [
+      "동작구"
+    ],
+    "website": "https://schema.org",
+    "instagram": "https://instagram.com/asha_yoga_",
+    "rag_payload": {
+      "studio_id": "요가아샤-서울특별시동작구",
+      "geo": {
+        "lat": 37.4987864,
+        "lon": 126.9292604,
+        "geohash": "wydm26"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "요가아샤 in 동작구. Category: 스포츠시설>요가원. Website: https://schema.org.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 19,
+    "name": "휘트니스 캐리스타",
+    "road_address": "서울특별시 광진구 능동로 7 한강복합빌딩 2층 휘트니스 캐리스타",
+    "address": "서울특별시 광진구 자양동 74-14 한강복합빌딩 2층 휘트니스 캐리스타",
+    "lat": 37.5323473,
+    "lng": 127.0667964,
+    "place_url": "http://pf.kakao.com/_WWxbzn",
+    "phone": null,
+    "category": "스포츠시설>헬스장",
+    "enriched_at": "2026-05-19T21:07:50.211219+00:00",
+    "geohash": "wydme2",
+    "neighborhood": "광진구",
+    "neighborhood_tags": [
+      "광진구"
+    ],
+    "website": "https://schema.org",
+    "rag_payload": {
+      "studio_id": "휘트니스-캐리스타-서울특별시광진구",
+      "geo": {
+        "lat": 37.5323473,
+        "lon": 127.0667964,
+        "geohash": "wydme2"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "휘트니스 캐리스타 in 광진구. Category: 스포츠시설>헬스장. Website: https://schema.org.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 20,
+    "name": "공감요가",
+    "road_address": "서울특별시 동대문구 장한로 20 4층 공감요가",
+    "address": "서울특별시 동대문구 장안동 433-5 4층 공감요가",
+    "lat": 37.5630587,
+    "lng": 127.0660575,
+    "place_url": "https://booking.naver.com/booking/6/bizes/956127",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:07:53.356060+00:00",
+    "geohash": "wydmeq",
+    "neighborhood": "동대문구",
+    "neighborhood_tags": [
+      "동대문구"
+    ],
+    "website": "https://ssl.pstatic.net",
+    "instagram": "https://instagram.com/gonggam_yoga",
+    "rag_payload": {
+      "studio_id": "공감요가-서울특별시동대문구",
+      "geo": {
+        "lat": 37.5630587,
+        "lon": 127.0660575,
+        "geohash": "wydmeq"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "공감요가 in 동대문구. Category: 스포츠시설>요가원. Website: https://ssl.pstatic.net.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 21,
+    "name": "바른요가필라테스",
+    "road_address": "서울특별시 종로구 종로 344 대우디오빌 2층 바른요가필라테스",
+    "address": "서울특별시 종로구 숭인동 310 대우디오빌 2층 바른요가필라테스",
+    "lat": 37.5727249,
+    "lng": 127.0161059,
+    "place_url": "https://blog.naver.com/bareunyoga",
+    "phone": null,
+    "category": "스포츠시설>필라테스",
+    "enriched_at": "2026-05-19T21:07:56.845198+00:00",
+    "geohash": "wydmdr",
+    "neighborhood": "종로구",
+    "neighborhood_tags": [
+      "종로구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/brc_pilates",
+    "rag_payload": {
+      "studio_id": "바른요가필라테스-서울특별시종로구",
+      "geo": {
+        "lat": 37.5727249,
+        "lon": 127.0161059,
+        "geohash": "wydmdr"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "바른요가필라테스 in 종로구. Category: 스포츠시설>필라테스. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 22,
+    "name": "요가바이아터스",
+    "road_address": "서울특별시 송파구 송파대로 410 송연빌딩 2층",
+    "address": "서울특별시 송파구 송파동 89-2 송연빌딩 2층",
+    "lat": 37.5039911,
+    "lng": 127.1087166,
+    "place_url": "http://www.instagram.com/yogabyotters",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:00.180594+00:00",
+    "geohash": "wydmk7",
+    "neighborhood": "송파구",
+    "neighborhood_tags": [
+      "송파구"
+    ],
+    "instagram": "https://instagram.com/rsrc.php",
+    "rag_payload": {
+      "studio_id": "요가바이아터스-서울특별시송파구",
+      "geo": {
+        "lat": 37.5039911,
+        "lon": 127.1087166,
+        "geohash": "wydmk7"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "요가바이아터스 in 송파구. Category: 스포츠시설>요가원.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 23,
+    "name": "라인요가",
+    "road_address": "서울특별시 서초구 서초대로 3-4 503호 라인요가",
+    "address": "서울특별시 서초구 방배동 3001-2 503호 라인요가",
+    "lat": 37.4860933,
+    "lng": 126.9829747,
+    "place_url": "https://blog.naver.com/merry9797",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:03.661033+00:00",
+    "geohash": "wydm38",
+    "neighborhood": "서초구",
+    "neighborhood_tags": [
+      "서초구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/better_line_pilates",
+    "rag_payload": {
+      "studio_id": "라인요가-서울특별시서초구",
+      "geo": {
+        "lat": 37.4860933,
+        "lon": 126.9829747,
+        "geohash": "wydm38"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "라인요가 in 서초구. Category: 스포츠시설>요가원. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 24,
+    "name": "라라요가",
+    "road_address": "서울특별시 관악구 청림3길 10",
+    "address": "서울특별시 관악구 봉천동 1729",
+    "lat": 37.4885013,
+    "lng": 126.9592218,
+    "place_url": "https://blog.naver.com/lalayoga",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:06.794214+00:00",
+    "geohash": "wydm30",
+    "neighborhood": "관악구",
+    "neighborhood_tags": [
+      "관악구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/sahasrara_yoga1",
+    "facebook": "https://facebook.com/aleafsports",
+    "rag_payload": {
+      "studio_id": "라라요가-서울특별시관악구",
+      "geo": {
+        "lat": 37.4885013,
+        "lon": 126.9592218,
+        "geohash": "wydm30"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "라라요가 in 관악구. Category: 스포츠시설>요가원. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 25,
+    "name": "우리 요가아누",
+    "road_address": "서울특별시 송파구 백제고분로 421 동화빌딩 401호",
+    "address": "서울특별시 송파구 송파동 47-5 동화빌딩 401호",
+    "lat": 37.5085176,
+    "lng": 127.110801,
+    "place_url": "https://blog.naver.com/wooriyoga",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:09.782837+00:00",
+    "geohash": "wydmkk",
+    "neighborhood": "송파구",
+    "neighborhood_tags": [
+      "송파구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/woori_yogaanu",
+    "rag_payload": {
+      "studio_id": "우리-요가아누-서울특별시송파구",
+      "geo": {
+        "lat": 37.5085176,
+        "lon": 127.110801,
+        "geohash": "wydmkk"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "우리 요가아누 in 송파구. Category: 스포츠시설>요가원. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 26,
+    "name": "데바야나요가",
+    "road_address": "서울특별시 도봉구 도봉로181길 8 2층",
+    "address": "서울특별시 도봉구 도봉동 561-7 2층",
+    "lat": 37.6840479,
+    "lng": 127.0454698,
+    "place_url": "https://www.instagram.com/devayanayoga",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:12.833904+00:00",
+    "geohash": "wydq6u",
+    "neighborhood": "도봉구",
+    "neighborhood_tags": [
+      "도봉구"
+    ],
+    "instagram": "https://instagram.com/rsrc.php",
+    "rag_payload": {
+      "studio_id": "데바야나요가-서울특별시도봉구",
+      "geo": {
+        "lat": 37.6840479,
+        "lon": 127.0454698,
+        "geohash": "wydq6u"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "데바야나요가 in 도봉구. Category: 스포츠시설>요가원.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 27,
+    "name": "메이드수 필라테스&amp;플라잉요가 남성역점",
+    "road_address": "서울특별시 동작구 사당로 234",
+    "address": "서울특별시 동작구 사당동 266-4",
+    "lat": 37.4832534,
+    "lng": 126.9735377,
+    "place_url": "https://blog.naver.com/made_su03",
+    "phone": null,
+    "category": "스포츠시설>필라테스",
+    "enriched_at": "2026-05-19T21:08:16.343741+00:00",
+    "geohash": "wydm1r",
+    "neighborhood": "동작구",
+    "neighborhood_tags": [
+      "동작구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "rag_payload": {
+      "studio_id": "메이드수-필라테스&amp;플라잉요가-남성역점-서울특별시동작구",
+      "geo": {
+        "lat": 37.4832534,
+        "lon": 126.9735377,
+        "geohash": "wydm1r"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "메이드수 필라테스&amp;플라잉요가 남성역점 in 동작구. Category: 스포츠시설>필라테스. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 28,
+    "name": "해맑은요가",
+    "road_address": "서울특별시 양천구 신목로 97 정산빌딩 602호",
+    "address": "서울특별시 양천구 목동 405-24 정산빌딩 602호",
+    "lat": 37.5234381,
+    "lng": 126.8749917,
+    "place_url": "http://heayoga.itpage.kr",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:19.888392+00:00",
+    "geohash": "wydjrn",
+    "neighborhood": "양천구",
+    "neighborhood_tags": [
+      "양천구"
+    ],
+    "instagram": "https://instagram.com/heayoga_master_1998",
+    "website": "https://heayoga.itpage.kr/user/h/heayoga/20201221144810_uCh7oW9Q.png",
+    "rag_payload": {
+      "studio_id": "해맑은요가-서울특별시양천구",
+      "geo": {
+        "lat": 37.5234381,
+        "lon": 126.8749917,
+        "geohash": "wydjrn"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "해맑은요가 in 양천구. Category: 스포츠시설>요가원. Website: https://heayoga.itpage.kr/user/h/heayoga/20201221144810_uCh7oW9Q.png.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 29,
+    "name": "요가다움",
+    "road_address": "서울특별시 서초구 서초대로56길 39 6층",
+    "address": "서울특별시 서초구 서초동 1667-12 6층",
+    "lat": 37.4929232,
+    "lng": 127.0176978,
+    "place_url": "https://blog.naver.com/yoga_daum",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:22.484241+00:00",
+    "geohash": "wydm63",
+    "neighborhood": "서초구",
+    "neighborhood_tags": [
+      "서초구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/yoga_daum",
+    "rag_payload": {
+      "studio_id": "요가다움-서울특별시서초구",
+      "geo": {
+        "lat": 37.4929232,
+        "lon": 127.0176978,
+        "geohash": "wydm63"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "요가다움 in 서초구. Category: 스포츠시설>요가원. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 30,
+    "name": "비베카요가",
+    "road_address": "서울특별시 동작구 사당로 189-1",
+    "address": "서울특별시 동작구 사당동 220-55",
+    "lat": 37.4855231,
+    "lng": 126.9697697,
+    "place_url": "https://pf.kakao.com/_PnPEK",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:25.771545+00:00",
+    "geohash": "wydm32",
+    "neighborhood": "동작구",
+    "neighborhood_tags": [
+      "동작구"
+    ],
+    "website": "https://schema.org",
+    "instagram": "https://instagram.com/vivekayoga_s",
+    "rag_payload": {
+      "studio_id": "비베카요가-서울특별시동작구",
+      "geo": {
+        "lat": 37.4855231,
+        "lon": 126.9697697,
+        "geohash": "wydm32"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "비베카요가 in 동작구. Category: 스포츠시설>요가원. Website: https://schema.org.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 31,
+    "name": "언더독 요가",
+    "road_address": "서울특별시 마포구 양화로7길 84 3층",
+    "address": "서울특별시 마포구 서교동 481-5 3층",
+    "lat": 37.5543687,
+    "lng": 126.9138818,
+    "place_url": "http://www.underdogyoga.co.kr",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T21:08:29.019684+00:00",
+    "geohash": "wydjxu",
+    "neighborhood": "마포구",
+    "neighborhood_tags": [
+      "마포구"
+    ],
+    "instagram": "https://instagram.com/underdog_yoga",
+    "website": "https://fonts.gstatic.com",
+    "rag_payload": {
+      "studio_id": "언더독-요가-서울특별시마포구",
+      "geo": {
+        "lat": 37.5543687,
+        "lon": 126.9138818,
+        "geohash": "wydjxu"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "언더독 요가 in 마포구. Category: 스포츠시설>요가원. Website: https://fonts.gstatic.com.",
         "instructor_lineage_tags": [],
         "injury_exclusion_flags": []
       }
