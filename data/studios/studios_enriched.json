@@ -1,0 +1,96 @@
+[
+  {
+    "id": 1,
+    "name": "힐니스필라테스스튜디오",
+    "road_address": "서울특별시 용산구 한강대로 95 상가 B동 지상 2층 234호",
+    "address": "서울특별시 용산구 한강로2가 422 상가 B동 지상 2층 234호",
+    "lat": 37.5294671,
+    "lng": 126.9671861,
+    "place_url": "https://www.instagram.com/healnessstudio",
+    "phone": null,
+    "category": "스포츠시설>필라테스",
+    "enriched_at": "2026-05-19T13:37:21.343156+00:00",
+    "geohash": "wydm90",
+    "neighborhood": "용산구",
+    "neighborhood_tags": [
+      "용산구"
+    ],
+    "instagram": "https://instagram.com/rsrc.php",
+    "rag_payload": {
+      "studio_id": "힐니스필라테스스튜디오-서울특별시용산구",
+      "geo": {
+        "lat": 37.5294671,
+        "lon": 126.9671861,
+        "geohash": "wydm90"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "힐니스필라테스스튜디오 in 용산구. Category: 스포츠시설>필라테스.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 2,
+    "name": "오앤 요가 필라테스",
+    "road_address": "서울특별시 강남구 테헤란로87길 13 서영빌딩9층",
+    "address": "서울특별시 강남구 삼성동 158-12 서영빌딩9층",
+    "lat": 37.5086418,
+    "lng": 127.0586395,
+    "place_url": "https://smartstore.naver.com/onyogastudio",
+    "phone": null,
+    "category": "스포츠시설>요가원",
+    "enriched_at": "2026-05-19T13:37:25.317926+00:00",
+    "geohash": "wydm7k",
+    "neighborhood": "강남구",
+    "neighborhood_tags": [
+      "강남구"
+    ],
+    "instagram": "https://instagram.com/on_yoga_pilates_studio",
+    "rag_payload": {
+      "studio_id": "오앤-요가-필라테스-서울특별시강남구",
+      "geo": {
+        "lat": 37.5086418,
+        "lon": 127.0586395,
+        "geohash": "wydm7k"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "오앤 요가 필라테스 in 강남구. Category: 스포츠시설>요가원.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  },
+  {
+    "id": 3,
+    "name": "좋은습관 PT STUDIO 연남",
+    "road_address": "서울특별시 마포구 성미산로 157 지하1층",
+    "address": "서울특별시 마포구 연남동 240-22 지하1층",
+    "lat": 37.5646303,
+    "lng": 126.9236741,
+    "place_url": "https://blog.naver.com/goodhabit_yeonnam",
+    "phone": null,
+    "category": "스포츠,오락>스포츠시설",
+    "enriched_at": "2026-05-19T13:37:29.151587+00:00",
+    "geohash": "wydm8n",
+    "neighborhood": "마포구",
+    "neighborhood_tags": [
+      "마포구"
+    ],
+    "website": "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",
+    "instagram": "https://instagram.com/goodhabit_yeonnam",
+    "rag_payload": {
+      "studio_id": "좋은습관-pt-studio-연남-서울특별시마포구",
+      "geo": {
+        "lat": 37.5646303,
+        "lon": 126.9236741,
+        "geohash": "wydm8n"
+      },
+      "search_vector_payload": {
+        "raw_chunk": "좋은습관 PT STUDIO 연남 in 마포구. Category: 스포츠,오락>스포츠시설. Website: http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd.",
+        "instructor_lineage_tags": [],
+        "injury_exclusion_flags": []
+      }
+    }
+  }
+]
