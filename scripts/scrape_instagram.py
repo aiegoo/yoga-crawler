@@ -2,15 +2,35 @@
 """
 Instagram scraper for yoga instructors and class schedules.
 
-Strategy
---------
-1. Hashtag crawl — iterate posts under yoga-instructor hashtags to discover
-   instructor accounts.  Korean hashtags targeted: #요가강사 #요가클래스
-   #서울요가 #요가스케줄 and city variants.
-2. Profile harvest — for each unique instructor profile, read the bio, follower
-   count, and recent posts to extract class schedule information.
-3. Caption parsing — regex heuristics extract class style, day/time, price and
-   studio name from Korean Instagram captions.
+Authentication
+--------------
+Uses session-cookie auth — no username/password ever sent.  Set env vars:
+
+  INSTAGRAM_SESSION_ID   sessionid cookie value from a logged-in browser
+  INSTAGRAM_CSRFTOKEN    csrftoken cookie value (grab from browser DevTools)
+  INSTAGRAM_CHIPS        X-IG-App-ID token (optional, improves success rate)
+  USER_AGENT             Full browser UA string (defaults to Chrome 124 UA)
+
+How to get the cookies (one-time setup):
+  1. Log into instagram.com in Chrome
+  2. DevTools → Application → Cookies → https://www.instagram.com
+  3. Copy "sessionid" → INSTAGRAM_SESSION_ID
+  4. Copy "csrftoken"  → INSTAGRAM_CSRFTOKEN
+
+Rate Limiting
+-------------
+A human-mimicking jitter sleep is used between every request:
+  --min-delay / --max-delay   (default 5–15 s, beta-distribution sampling)
+Use --delay N as a shortcut to set both bounds to N.
+
+Proxy Rotation
+--------------
+Set PROXY_LIST as a comma-separated list of residential proxy URLs:
+
+  PROXY_LIST=http://user:pass@p1.host:8080,http://user:pass@p2.host:8080
+
+Proxies are shuffled and rotated round-robin across requests.
+Or pass a single proxy with --proxy / PROXY_URL env var.
 
 Outputs
 -------
@@ -19,23 +39,24 @@ Outputs
 
 Usage
 -----
-  # Discover instructors via hashtags (no login, public only)
-  python scripts/scrape_instagram.py --mode hashtag --limit 200
+  # Profile harvest using session cookie (recommended)
+  INSTAGRAM_SESSION_ID=xxx INSTAGRAM_CSRFTOKEN=yyy \\
+    python scripts/scrape_instagram.py --mode profiles \\
+    --handles-file data/studios/studios_enriched.json
 
-  # Enrich from handles already known (e.g. scraped from studio pages)
-  python scripts/scrape_instagram.py --mode profiles \
-      --handles-file data/studios/studios_enriched.json
+  # With proxy rotation + custom delays
+  PROXY_LIST=http://u:p@host:port \\
+    python scripts/scrape_instagram.py --mode all --min-delay 8 --max-delay 20
 
-  # Full pipeline
-  python scripts/scrape_instagram.py --mode all --limit 300 --delay 3
-
-  # Authenticated (higher rate limits)
+  # Legacy username/password (fallback, may trigger 2FA/checkpoint)
   python scripts/scrape_instagram.py --mode all --ig-user YOU --ig-pass PASS
+
+  # Dry-run to test config without hitting Instagram
+  python scripts/scrape_instagram.py --dry-run
 
 Notes
 -----
 * All data fetched is from public profiles only.
-* Instagram rate-limits unauthenticated requests heavily — keep --delay >= 3.
 * instaloader >= 4.10 required.
 """
 
