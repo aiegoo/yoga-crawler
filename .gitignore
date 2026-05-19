@@ -11,16 +11,13 @@ build/
 venv/
 .venv/
 
-# Data (raw crawl output — stored in S3, not git)
-data/
-
 # Secrets
 .env
 *.env
 *.pem
 *.key
 
-# Logs
+# Logs (runtime output — not versioned)
 logs/
 *.log
 cron.log

@@ -58,23 +58,24 @@ log = logging.getLogger("git_watch")
 
 # ── Config ────────────────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parent.parent
-MAX_FILE_KB = 500   # block files larger than this
+MAX_FILE_KB = 500   # block files larger than this (scripts)
+MAX_DATA_FILE_KB = 10240   # 10 MB cap for data JSON files
 
-# Commit groups: (label, list of glob patterns)
-COMMIT_GROUPS: list[tuple[str, list[str]]] = [
-    ("scraper: update crawl scripts",         ["scripts/scrape_*.py"]),
-    ("db: schema and data loader",            ["scripts/db_*.sql", "scripts/db_*.py"]),
+# Commit groups: (label, list of glob patterns, optional size override KB)
+COMMIT_GROUPS: list[tuple[str, list[str], int]] = [
+    ("scraper: update crawl scripts",         ["scripts/scrape_*.py"],              MAX_FILE_KB),
+    ("db: schema and data loader",            ["scripts/db_*.sql", "scripts/db_*.py"], MAX_FILE_KB),
     ("pipeline: orchestration and watcher",   ["pipeline.sh", "scripts/pipeline.sh",
-                                               "scripts/git_*.sh", "scripts/git_*.py"]),
+                                               "scripts/git_*.sh", "scripts/git_*.py"], MAX_FILE_KB),
     ("config: dependencies and environment",  ["requirements.txt", ".env.example",
-                                               ".gitignore"]),
-    ("docs: README and project docs",         ["*.md", "docs/**"]),
+                                               ".gitignore"],                        MAX_FILE_KB),
+    ("docs: README and project docs",         ["*.md", "docs/**"],                  MAX_FILE_KB),
+    ("data: crawl output",                    ["data/**/*.json", "data/**/*.sql"],   MAX_DATA_FILE_KB),
 ]
 CATCH_ALL_LABEL = "chore: miscellaneous updates"
 
 # Patterns to never commit (on top of .gitignore)
 NEVER_COMMIT: list[str] = [
-    "data/**",
     "logs/**",
     "*.log",
     "*.pyc",
@@ -127,17 +128,17 @@ def match_group(path: str, patterns: list[str]) -> bool:
     return False
 
 
-def commit_files(files: list[str], message: str, dry_run: bool) -> bool:
+def commit_files(files: list[str], message: str, dry_run: bool, max_kb: int = MAX_FILE_KB) -> bool:
     """Stage files and commit. Returns True if a commit was made."""
     if not files:
         return False
 
-    # Size guard
-    blocked = [f for f in files if file_size_kb(f) > MAX_FILE_KB]
+    # Size guard (use caller-supplied limit)
+    blocked = [f for f in files if file_size_kb(f) > max_kb]
     if blocked:
         for b in blocked:
-            log.error("BLOCKED large file (%dKB): %s", file_size_kb(b), b)
-        log.error("Add these to .gitignore or increase MAX_FILE_KB.")
+            log.error("BLOCKED large file (%dKB > %dKB limit): %s", file_size_kb(b), max_kb, b)
+        log.error("Add these to .gitignore or use git-lfs.")
         return False
 
     if dry_run:
@@ -147,7 +148,6 @@ def commit_files(files: list[str], message: str, dry_run: bool) -> bool:
         return False
 
     git(["add", "--"] + files)
-
     # Check if there is actually something staged
     staged = git(["diff", "--cached", "--name-only"])
     if not staged.stdout.strip():
@@ -192,10 +192,10 @@ def run_once(dry_run: bool) -> int:
     committed = 0
     assigned: set[str] = set()
 
-    for label, patterns in COMMIT_GROUPS:
+    for label, patterns, size_limit in COMMIT_GROUPS:
         group = [f for f in eligible if f not in assigned and match_group(f, patterns)]
         if group:
-            if commit_files(group, label, dry_run):
+            if commit_files(group, label, dry_run, max_kb=size_limit):
                 committed += 1
             assigned.update(group)
 

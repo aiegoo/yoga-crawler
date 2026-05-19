@@ -184,7 +184,16 @@ commit_group "config: dependencies and environment" \
 commit_group "docs: README and project docs" \
   README.md
 
-# Group 6: Everything else not yet staged (catch-all for new files)
+# Group 6: Crawl data (JSON + SQL seed files)
+mapfile -t data_files < <(
+  git -C "$REPO_DIR" ls-files --others --exclude-standard -- "data/**" 2>/dev/null || true
+  git -C "$REPO_DIR" diff --name-only -- "data/**" 2>/dev/null || true
+)
+if [[ ${#data_files[@]} -gt 0 ]]; then
+  commit_group "data: crawl output $(date -u +%Y-%m-%d)" "${data_files[@]}"
+fi
+
+# Group 7: Everything else not yet staged (catch-all for new files)
 mapfile -t remaining < <(
   git status --porcelain | grep -E "^\?\?|^ M|^M " | awk '{print $2}' | grep -v "^data/" || true
 )
