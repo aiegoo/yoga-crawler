@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import json
 import logging
 import os
@@ -52,12 +53,18 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Iterator
 
 try:
     import instaloader
 except ImportError:
     print("ERROR: pip install instaloader", file=sys.stderr)
     sys.exit(1)
+
+try:
+    import requests  # used only for proxy health-check
+except ImportError:
+    requests = None  # type: ignore
 
 logging.basicConfig(
     level=logging.INFO,
@@ -147,9 +154,105 @@ INSTRUCTOR_BIO_KEYWORDS = [
 ]
 
 
+# ── Default browser User-Agent ───────────────────────────────────────────────
+
+DEFAULT_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0.0.0 Safari/537.36"
+)
+
+# ── Proxy rotation ────────────────────────────────────────────────────────────
+
+class ProxyRotator:
+    """
+    Round-robin proxy pool.  Proxies are loaded from:
+      1. PROXY_LIST env var  (comma-separated proxy URLs)
+      2. --proxy CLI arg     (single proxy URL)
+    Each call to `next()` returns the next proxy dict suitable for
+    `requests.Session.proxies` / instaloader's underlying session.
+    """
+
+    def __init__(self, proxy_urls: list[str]) -> None:
+        self._pool: list[dict] = []
+        for url in proxy_urls:
+            url = url.strip()
+            if url:
+                self._pool.append({"http": url, "https": url})
+        if self._pool:
+            random.shuffle(self._pool)
+            log.info("Proxy pool: %d endpoint(s) loaded", len(self._pool))
+        else:
+            log.info("No proxies configured — using direct connection")
+        self._cycle: Iterator[dict] = itertools.cycle(self._pool) if self._pool else iter([])
+
+    @property
+    def active(self) -> bool:
+        return bool(self._pool)
+
+    def next(self) -> dict | None:
+        """Return next proxy dict, or None if pool is empty."""
+        try:
+            return next(self._cycle)
+        except StopIteration:
+            return None
+
+    def apply_to_loader(self, loader: instaloader.Instaloader, proxy: dict | None) -> None:
+        """Inject proxy into instaloader's underlying requests session."""
+        if not proxy:
+            return
+        session = loader.context._session
+        session.proxies.update(proxy)
+
+
+# ── Human-mimicking jitter sleep ──────────────────────────────────────────────
+
+def jitter_sleep(min_s: float = 5.0, max_s: float = 15.0) -> None:
+    """
+    Sleep for a random duration in [min_s, max_s] with sub-second noise.
+    The non-uniform distribution (beta) clusters around the midpoint, similar
+    to how a human's page-view cadence is distributed.
+    """
+    base = min_s + random.betavariate(2, 2) * (max_s - min_s)
+    noise = random.uniform(-0.3, 0.3)  # ±300ms micro-jitter
+    duration = max(min_s, base + noise)
+    log.debug("jitter sleep %.1fs", duration)
+    time.sleep(duration)
+
+
 # ── Instagram loader setup ────────────────────────────────────────────────────
 
-def make_loader(ig_user: str | None = None, ig_pass: str | None = None) -> instaloader.Instaloader:
+def _build_session_env() -> dict:
+    """
+    Read session credentials from environment variables.
+    Returns a dict with the values (may be empty strings if not set).
+    """
+    return {
+        "session_id":   os.environ.get("INSTAGRAM_SESSION_ID", "").strip(),
+        "csrftoken":    os.environ.get("INSTAGRAM_CSRFTOKEN", "").strip(),
+        "chips":        os.environ.get("INSTAGRAM_CHIPS", "").strip(),
+        "user_agent":   os.environ.get("USER_AGENT", DEFAULT_UA).strip(),
+    }
+
+
+def make_loader(
+    ig_user: str | None = None,
+    ig_pass: str | None = None,
+    proxy_rotator: ProxyRotator | None = None,
+) -> instaloader.Instaloader:
+    """
+    Build an instaloader instance.
+
+    Authentication priority:
+      1. Session-cookie auth  (INSTAGRAM_SESSION_ID env var) — preferred
+      2. Username/password    (ig_user / ig_pass args)        — fallback
+      3. Anonymous                                            — last resort
+
+    A proxy from `proxy_rotator` (if provided) is applied to the first request
+    before auth so the auth call itself goes through the proxy.
+    """
+    env = _build_session_env()
+
     loader = instaloader.Instaloader(
         download_pictures=False,
         download_videos=False,
@@ -158,14 +261,54 @@ def make_loader(ig_user: str | None = None, ig_pass: str | None = None) -> insta
         download_comments=False,
         save_metadata=False,
         quiet=True,
-        max_connection_attempts=2,
+        max_connection_attempts=3,
+        user_agent=env["user_agent"],
     )
+
+    # Inject initial proxy before any auth request
+    if proxy_rotator and proxy_rotator.active:
+        proxy = proxy_rotator.next()
+        proxy_rotator.apply_to_loader(loader, proxy)
+        log.info("Initial proxy: %s", list(proxy.values())[0] if proxy else "none")
+
+    # ── Path 1: session-cookie auth ───────────────────────────────────────────
+    if env["session_id"]:
+        session = loader.context._session
+        # Set required cookies directly — no credentials sent to Instagram
+        session.cookies.set("sessionid",  env["session_id"], domain=".instagram.com")
+        if env["csrftoken"]:
+            session.cookies.set("csrftoken", env["csrftoken"],  domain=".instagram.com")
+        # Update headers
+        session.headers.update({
+            "User-Agent":       env["user_agent"],
+            "X-CSRFToken":      env["csrftoken"] or "",
+            "X-IG-App-ID":      env["chips"] or "936619743392459",  # public app id
+            "X-Requested-With": "XMLHttpRequest",
+            "Referer":          "https://www.instagram.com/",
+        })
+        # Mark context as authenticated so instaloader skips its own login flow
+        loader.context._session = session
+        log.info("Session-cookie auth configured (sessionid=...%s)",
+                 env["session_id"][-6:])
+        return loader
+
+    # ── Path 2: username/password auth ────────────────────────────────────────
     if ig_user and ig_pass:
         try:
             loader.login(ig_user, ig_pass)
             log.info("Logged in as @%s", ig_user)
+        except instaloader.exceptions.TwoFactorAuthRequiredException:
+            log.error("2FA required — use session-cookie auth instead")
         except Exception as exc:
             log.warning("Login failed: %s — continuing as anonymous", exc)
+        return loader
+
+    # ── Path 3: anonymous ─────────────────────────────────────────────────────
+    log.warning(
+        "No auth configured.  Set INSTAGRAM_SESSION_ID env var or "
+        "pass --ig-user / --ig-pass.  Unauthenticated requests will be "
+        "rate-limited or blocked."
+    )
     return loader
 
 
@@ -257,7 +400,9 @@ def looks_like_instructor(profile: instaloader.Profile) -> bool:
 # ── Core scraping functions ───────────────────────────────────────────────────
 
 def harvest_hashtag(loader: instaloader.Instaloader, hashtag: str,
-                    limit: int, delay: float) -> tuple[set[str], list[dict]]:
+                    limit: int,
+                    min_delay: float = 5.0, max_delay: float = 15.0,
+                    proxy_rotator: ProxyRotator | None = None) -> tuple[set[str], list[dict]]:
     """
     Crawl posts under `hashtag`. Return:
       - set of Instagram usernames that look like instructors
@@ -309,7 +454,10 @@ def harvest_hashtag(loader: instaloader.Instaloader, hashtag: str,
             log.debug("Post error: %s", exc)
             continue
 
-        time.sleep(random.uniform(delay * 0.5, delay))
+        # Rotate proxy and apply jitter between posts
+        if proxy_rotator and proxy_rotator.active:
+            proxy_rotator.apply_to_loader(loader, proxy_rotator.next())
+        jitter_sleep(min_delay, max_delay)
 
     log.info("  #%s → %d posts, %d potential instructors, %d class slots",
              hashtag, count, len(instructor_handles), len(raw_classes))
@@ -317,7 +465,9 @@ def harvest_hashtag(loader: instaloader.Instaloader, hashtag: str,
 
 
 def harvest_profile(loader: instaloader.Instaloader, handle: str,
-                    post_limit: int, delay: float) -> tuple[dict | None, list[dict]]:
+                    post_limit: int,
+                    min_delay: float = 5.0, max_delay: float = 15.0,
+                    proxy_rotator: ProxyRotator | None = None) -> tuple[dict | None, list[dict]]:
     """
     Fetch full profile info for `handle` and parse recent posts for schedules.
     Returns (instructor_dict, list_of_class_dicts).
@@ -399,7 +549,9 @@ def harvest_profile(loader: instaloader.Instaloader, handle: str,
                     "caption_snippet":   caption[:300],
                     "scraped_at":        datetime.now(timezone.utc).isoformat(),
                 })
-            time.sleep(random.uniform(0.5, delay))
+            if proxy_rotator and proxy_rotator.active:
+                proxy_rotator.apply_to_loader(loader, proxy_rotator.next())
+            jitter_sleep(min_delay * 0.3, min_delay * 0.7)  # shorter between posts on same profile
     except instaloader.exceptions.LoginRequiredException:
         log.warning("@%s posts require login", handle)
     except Exception as exc:
@@ -457,8 +609,13 @@ def main() -> None:
                     help="Max posts to scan per hashtag (default: 150)")
     ap.add_argument("--post-limit", type=int, default=20,
                     help="Max recent posts to parse per profile (default: 20)")
-    ap.add_argument("--delay", type=float, default=3.0,
-                    help="Seconds between requests (default: 3.0)")
+    ap.add_argument("--min-delay", type=float, default=5.0,
+                    help="Min seconds between requests, jitter lower bound (default: 5)")
+    ap.add_argument("--max-delay", type=float, default=15.0,
+                    help="Max seconds between requests, jitter upper bound (default: 15)")
+    # Legacy --delay maps to both bounds for backwards compatibility
+    ap.add_argument("--delay", type=float, default=None,
+                    help="Fixed delay shortcut — overrides --min-delay / --max-delay")
     ap.add_argument("--handles", default="",
                     help="Comma-separated handles to profile directly")
     ap.add_argument("--handles-file", type=Path, default=None,
@@ -467,13 +624,28 @@ def main() -> None:
                     help="Instagram username for auth session (env: IG_USER)")
     ap.add_argument("--ig-pass", default=os.environ.get("IG_PASS"),
                     help="Instagram password (env: IG_PASS)")
+    ap.add_argument("--proxy", default=os.environ.get("PROXY_URL", ""),
+                    help="Single proxy URL (env: PROXY_URL). Overridden by PROXY_LIST.")
     ap.add_argument("--out-dir", type=Path, default=REPO_ROOT / "data",
                     help="Output root directory (default: data/)")
     ap.add_argument("--dry-run", action="store_true",
                     help="Parse and print without writing files")
     args = ap.parse_args()
 
-    loader = make_loader(args.ig_user, args.ig_pass)
+    # Resolve delay bounds
+    min_delay = args.delay if args.delay is not None else args.min_delay
+    max_delay = args.delay if args.delay is not None else args.max_delay
+    if min_delay > max_delay:
+        max_delay = min_delay  # keep valid range
+
+    # Build proxy pool: PROXY_LIST env var takes priority over --proxy
+    proxy_env = os.environ.get("PROXY_LIST", "")
+    proxy_urls = [u for u in proxy_env.split(",") if u.strip()] if proxy_env else (
+        [args.proxy] if args.proxy else []
+    )
+    proxy_rotator = ProxyRotator(proxy_urls)
+
+    loader = make_loader(args.ig_user, args.ig_pass, proxy_rotator)
 
     all_instructor_handles: set[str] = set()
     all_raw_classes: list[dict] = []
@@ -483,14 +655,18 @@ def main() -> None:
         hashtags = [h.strip() for h in args.hashtags.split(",") if h.strip()] or ALL_HASHTAGS
         for ht in hashtags:
             try:
-                handles, classes = harvest_hashtag(loader, ht, args.limit, args.delay)
+                handles, classes = harvest_hashtag(
+                    loader, ht, args.limit,
+                    min_delay=min_delay, max_delay=max_delay,
+                    proxy_rotator=proxy_rotator,
+                )
                 all_instructor_handles.update(handles)
                 all_raw_classes.extend(classes)
             except KeyboardInterrupt:
                 log.info("Interrupted — saving partial results")
                 break
-            # Longer pause between hashtags to avoid rate limiting
-            time.sleep(random.uniform(args.delay, args.delay * 2))
+            # Extra pause between hashtags
+            jitter_sleep(min_delay, max_delay * 1.5)
 
         log.info("Phase 1 complete: %d candidate instructor handles discovered",
                  len(all_instructor_handles))
@@ -518,11 +694,15 @@ def main() -> None:
         log.info("Phase 2: profiling %d handles", len(handles_list))
         for i, handle in enumerate(handles_list, 1):
             log.info("[%d/%d] @%s", i, len(handles_list), handle)
-            inst, classes = harvest_profile(loader, handle, args.post_limit, args.delay)
+            inst, classes = harvest_profile(
+                loader, handle, args.post_limit,
+                min_delay=min_delay, max_delay=max_delay,
+                proxy_rotator=proxy_rotator,
+            )
             if inst:
                 instructors.append(inst)
                 profile_classes.extend(classes)
-            time.sleep(random.uniform(args.delay, args.delay * 1.5))
+            jitter_sleep(min_delay, max_delay)
 
         log.info("Phase 2 complete: %d instructors, %d class slots",
                  len(instructors), len(profile_classes))
