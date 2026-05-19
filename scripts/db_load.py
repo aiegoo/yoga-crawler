@@ -245,6 +245,76 @@ def load_associations(conn, json_path: Path, dry_run: bool = False) -> int:
     return len(rows)
 
 
+
+def load_classes(conn, json_path: Path, dry_run: bool = False) -> int:
+    if not json_path.exists():
+        log.warning("Classes JSON not found: %s", json_path)
+        return 0
+
+    classes: list[dict] = json.loads(json_path.read_text(encoding="utf-8"))
+    if dry_run:
+        log.info("[DRY-RUN] Would upsert %d classes", len(classes))
+        return len(classes)
+
+    # Resolve instructor DB ids by instagram_handle or instructor_id
+    handle_to_db: dict[str, int] = {}
+    with conn.cursor() as cur:
+        cur.execute("SELECT id, instagram FROM instructors WHERE instagram IS NOT NULL")
+        for db_id, handle in cur.fetchall():
+            handle_to_db[handle.lstrip("@")] = db_id
+
+    sql = """
+        INSERT INTO classes
+          (instructor_id, title, style, price, schedule,
+           contraindications, description, scraped_at)
+        VALUES
+          (%(instructor_id)s, %(title)s, %(style)s, %(price)s,
+           %(schedule)s, %(contraindications)s, %(description)s,
+           %(scraped_at)s)
+        ON CONFLICT DO NOTHING
+    """
+
+    rows = []
+    for c in classes:
+        handle = (c.get("instructor_handle") or "").lstrip("@")
+        inst_db_id = handle_to_db.get(handle)  # None if instructor not yet in DB
+
+        style = c.get("style") or (
+            c.get("styles", [None])[0] if c.get("styles") else None
+        )
+        price = c.get("price_krw")
+        if price is not None:
+            try:
+                price = float(price)
+            except (TypeError, ValueError):
+                price = None
+
+        schedule = c.get("schedule")
+        if not isinstance(schedule, str):
+            schedule = json.dumps(schedule, ensure_ascii=False) if schedule else None
+
+        contraindications = c.get("contraindications") or []
+        if isinstance(contraindications, str):
+            contraindications = [k.strip() for k in contraindications.split(",") if k.strip()]
+
+        rows.append({
+            "instructor_id":    inst_db_id,
+            "title":            c.get("title") or (f"{handle} 요가 클래스"),
+            "style":            style,
+            "price":            price,
+            "schedule":         schedule,
+            "contraindications": contraindications or None,
+            "description":      c.get("caption_snippet") or None,
+            "scraped_at":       c.get("scraped_at") or datetime.now(timezone.utc).isoformat(),
+        })
+
+    with conn.cursor() as cur:
+        psycopg2.extras.execute_batch(cur, sql, rows, page_size=500)
+    conn.commit()
+    log.info("Upserted %d classes", len(rows))
+    return len(rows)
+
+
 # ── S3 download ───────────────────────────────────────────────────────────────
 
 def download_from_s3(date_str: str, local_root: Path) -> None:
@@ -267,8 +337,8 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Load crawled JSON data into PostgreSQL")
     p.add_argument(
         "--tables", nargs="+",
-        choices=["studios", "instructors", "associations"],
-        default=["studios", "instructors", "associations"],
+        choices=["studios", "instructors", "associations", "classes"],
+        default=["studios", "instructors", "associations", "classes"],
     )
     p.add_argument(
         "--data-dir", type=Path, default=DATA_ROOT,
@@ -313,6 +383,10 @@ def main() -> None:
     if "associations" in args.tables:
         path = args.data_dir / "associations" / "associations_raw.json"
         totals["associations"] = load_associations(conn, path, args.dry_run)
+
+    if "classes" in args.tables:
+        path = args.data_dir / "classes" / "classes_raw.json"
+        totals["classes"] = load_classes(conn, path, args.dry_run)
 
     if conn:
         # Print summary
