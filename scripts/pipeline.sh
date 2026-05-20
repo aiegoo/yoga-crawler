@@ -191,3 +191,36 @@ print(len(json.loads(f.read_text())) if f.exists() else 0)
   echo "  S3 bucket    : s3://${S3_BUCKET}/${DATE}/"
 fi
 echo "=============================="
+
+# ── 5. Gov sangga (소상공인마당) — monthly refresh ────────────────────────────
+# Runs automatically on day 1 of each month, OR when --only gov is passed.
+# Requires SANGGA_API_KEY env var (free API key from https://data.go.kr).
+# Register at: https://www.data.go.kr/data/15012005/openapi.do
+if [[ -z "$ONLY" && "$(date -u +%d)" == "01" ]] || [[ "$ONLY" == "gov" ]]; then
+  echo ""
+  echo ">>> [5/5] Gov sangga monthly refresh (소상공인 상가정보 API)..."
+
+  if [[ -z "${SANGGA_API_KEY:-}" ]]; then
+    echo "    SKIPPED — SANGGA_API_KEY not set."
+    echo "    To enable: sudo sh -c 'echo SANGGA_API_KEY=your_key >> /etc/environment'"
+  else
+    python "$SCRIPTS_DIR/scrape_gov_sangga.py" \
+      --load-db \
+      --delay 0.5 \
+      $DRY_FLAG \
+      && echo "    Gov sangga: OK" \
+      || echo "    Gov sangga: FAILED (continuing)"
+
+    # Cross-reference after load
+    if ! $DRY_RUN; then
+      python "$SCRIPTS_DIR/crossref_gov_kakao.py" \
+        --out-dir "$DATA_DIR" \
+        && echo "    Crossref: OK" \
+        || echo "    Crossref: FAILED"
+
+      aws s3 cp "$DATA_DIR/crossref_report_$(date -u +%Y%m%d).csv" \
+        "s3://${S3_BUCKET}/${DATE}/reports/" \
+        --region "$REGION" 2>/dev/null || true
+    fi
+  fi
+fi
