@@ -15,6 +15,9 @@
 
 set -euo pipefail
 
+# Ensure aws CLI is on PATH for cron (cron uses minimal PATH)
+export PATH="/usr/local/bin:$PATH"
+
 # ── Config ────────────────────────────────────────────────────────────────────
 REPO_DIR="/home/ubuntu/yoga-crawler"
 SCRIPTS_DIR="/home/ubuntu/yoga-crawler/scripts"
