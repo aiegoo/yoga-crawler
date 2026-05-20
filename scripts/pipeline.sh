@@ -77,15 +77,36 @@ $DRY_RUN || S3_FLAG="--s3-sync"
 # ── 1. Studios (Kakao + Naver) ────────────────────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "studios" ]]; then
   echo ""
-  echo ">>> [1/3] Scraping yoga studios..."
-  python "$SCRIPTS_DIR/scrape_studios.py" \
-    --all-cities \
-    --delay 1.5 \
-    --out-dir "$DATA_DIR/studios" \
-    $DRY_FLAG \
-    $S3_FLAG \
-    && echo "    Studios: OK" \
-    || echo "    Studios: FAILED (continuing)"
+  echo ">>> [1/3] Scraping yoga studios (batched by city to limit memory)..."
+  # Run in 5 batches of 5 cities — avoids OOM on t3.micro (1 GB RAM)
+  # scrape_studios.py merges with existing studios_raw.json on each run
+  declare -a CITY_BATCHES=(
+    "Seoul Busan Daegu Incheon Gwangju"
+    "Daejeon Ulsan Suwon Changwon Seongnam"
+    "Goyang Yongin Bucheon Cheongju Ansan"
+    "Jeonju Anyang Cheonan Namyangju Hwaseong"
+    "Jeju Gimhae Hanam Uijeongbu Siheung"
+  )
+  STUDIO_STATUS="OK"
+  for batch in "${CITY_BATCHES[@]}"; do
+    # shellcheck disable=SC2086
+    python "$SCRIPTS_DIR/scrape_studios.py" \
+      --cities $batch \
+      --delay 1.5 \
+      --out-dir "$DATA_DIR/studios" \
+      $DRY_FLAG \
+      || { STUDIO_STATUS="FAILED"; echo "    Batch [$batch] FAILED (continuing)"; }
+  done
+  # S3 sync once after all batches complete
+  if [[ "$STUDIO_STATUS" == "OK" ]] && ! $DRY_RUN; then
+    aws s3 sync "$DATA_DIR/studios/" \
+      "s3://${S3_BUCKET}/${DATE}/studios/" \
+      --exclude "*.sql" \
+      --region "$REGION" \
+      && echo "    Studios S3 sync: OK" \
+      || echo "    Studios S3 sync: FAILED"
+  fi
+  echo "    Studios: $STUDIO_STATUS"
 fi
 
 # ── 2. Instructors (Yoga Alliance + Instagram) ────────────────────────────────
@@ -120,7 +141,6 @@ if [[ -z "$ONLY" || "$ONLY" == "associations" ]]; then
     --source all \
     --pages 5 \
     --delay 2.0 \
-    --out-dir "$DATA_DIR/associations" \
     $DRY_FLAG \
     $S3_FLAG \
     && echo "    Associations: OK" \
