@@ -522,6 +522,7 @@ def parse_args() -> argparse.Namespace:
                    help="Existing instructors_raw.json to enrich (skip YA scrape)")
     p.add_argument("--out-json", type=Path, default=OUT_JSON)
     p.add_argument("--out-sql",  type=Path, default=OUT_SQL)
+    p.add_argument("--dry-run", action="store_true", help="No-op: accepted for pipeline compatibility")
     return p.parse_args()
 
 

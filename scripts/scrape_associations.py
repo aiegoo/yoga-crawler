@@ -338,6 +338,7 @@ def parse_args() -> argparse.Namespace:
                    help="Pages to scrape from Yoga Alliance directory")
     p.add_argument("--delay", type=float, default=2.0)
     p.add_argument("--s3-sync", action="store_true")
+    p.add_argument("--dry-run", action="store_true", help="No-op: accepted for pipeline compatibility")
     return p.parse_args()
 
 
