@@ -129,6 +129,14 @@ def scrape_yoga_alliance(city: str, pages: int, delay: float) -> list[dict]:
             log.warning("HTTP error on page %d: %s", page, exc)
             break
 
+        # Detect YA policy-redirect (directory access removed without login)
+        if "directory-listing-policy" in str(resp.url) or "policies-priorities" in str(resp.url):
+            log.warning(
+                "Yoga Alliance redirected to policy page — directory is no longer publicly accessible. "
+                "URL: %s", resp.url
+            )
+            break
+
         soup = BeautifulSoup(resp.text, "html.parser")
 
         # Each instructor card — selector may need updating if YA redesigns their page

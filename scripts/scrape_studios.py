@@ -421,6 +421,14 @@ def main() -> None:
             all_studios.extend(naver_search(q, delay=args.delay, dry_run=args.dry_run))
 
     log.info("Raw results: %d", len(all_studios))
+    # Merge with existing JSON so city batches accumulate rather than overwrite
+    if out_json.exists():
+        try:
+            existing = json.loads(out_json.read_text(encoding="utf-8"))
+            log.info("Merging with %d existing studios", len(existing))
+            all_studios = existing + all_studios
+        except Exception as exc:
+            log.warning("Could not read existing JSON (%s) — starting fresh", exc)
     deduped = deduplicate(all_studios)
     log.info("After dedup: %d", len(deduped))
 
