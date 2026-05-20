@@ -224,3 +224,55 @@ if [[ -z "$ONLY" && "$(date -u +%d)" == "01" ]] || [[ "$ONLY" == "gov" ]]; then
     fi
   fi
 fi
+
+# ── 6. Website page crawler ───────────────────────────────────────────────────
+# Crawls known studio websites for class schedules, prices, teacher bios, booking URLs
+# Runs daily — processes up to 200 unenriched studios per run
+if [[ -z "$ONLY" || "$ONLY" == "web" ]]; then
+  echo ""
+  echo ">>> [6/8] Website crawler (studio pages, schedules, prices)..."
+  python "$SCRIPTS_DIR/scrape_web.py" \
+    --limit 200 \
+    --delay 1.5 \
+    $DRY_FLAG \
+    && echo "    Web crawler: OK" \
+    || echo "    Web crawler: FAILED (continuing)"
+fi
+
+# ── 7. Instagram profile harvester ───────────────────────────────────────────
+# Fetches follower count, bio, recent hashtags from known studio IG handles
+# Uses instaloader (session cookie) if INSTAGRAM_SESSION_ID set, else oEmbed
+if [[ -z "$ONLY" || "$ONLY" == "instagram" || "$ONLY" == "ig" ]]; then
+  echo ""
+  echo ">>> [7/8] Instagram profile harvest..."
+  IG_MODE="oembed"
+  [[ -n "${INSTAGRAM_SESSION_ID:-}" ]] && IG_MODE="instaloader"
+  [[ -n "${APIFY_TOKEN:-}" ]]          && IG_MODE="apify"
+  echo "    IG mode: $IG_MODE"
+  python "$SCRIPTS_DIR/scrape_ig_profiles.py" \
+    --mode "$IG_MODE" \
+    --limit 300 \
+    --delay 8 \
+    --discover \
+    $DRY_FLAG \
+    && echo "    Instagram: OK" \
+    || echo "    Instagram: FAILED (continuing)"
+fi
+
+# ── 8. GitHub yoga profile miner ─────────────────────────────────────────────
+# Mines GitHub Search API for yoga/yoga-alliance devs, orgs, and repos
+# Requires GITHUB_TOKEN for 5,000 req/hr (without token: 60 req/hr)
+# Runs weekly on Sunday only to avoid rate limits
+if [[ ( -z "$ONLY" && "$(date -u +%u)" == "7" ) || "$ONLY" == "github" ]]; then
+  echo ""
+  echo ">>> [8/8] GitHub yoga profile mine..."
+  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+    echo "    NOTE: GITHUB_TOKEN not set — rate-limited to 60 req/hr"
+    echo "    Set at: https://github.com/settings/tokens (no scopes needed)"
+  fi
+  python "$SCRIPTS_DIR/scrape_github_yoga.py" \
+    --out-dir "$DATA_DIR/github" \
+    $DRY_FLAG \
+    && echo "    GitHub mine: OK" \
+    || echo "    GitHub mine: FAILED (continuing)"
+fi
