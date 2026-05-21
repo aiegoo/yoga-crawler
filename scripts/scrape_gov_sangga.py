@@ -155,6 +155,88 @@ def api_item_to_csv_row(item: dict) -> dict:
     }
 
 
+def sangga_to_studio(row: dict) -> dict | None:
+    """Convert a 소상공인 CSV row to the studios_raw.json schema.
+
+    Returns None for rows with no business name.
+    """
+    name = row.get("상호명", "").strip()
+    branch = row.get("지점명", "").strip()
+    if not name:
+        return None
+
+    full_name = f"{name} {branch}".strip() if branch else name
+
+    try:
+        x = str(float(row.get("경도") or 0)) if row.get("경도") else ""
+        y = str(float(row.get("위도") or 0)) if row.get("위도") else ""
+        # Treat 0.0 coords as missing
+        if x == "0.0":
+            x = ""
+        if y == "0.0":
+            y = ""
+    except (ValueError, TypeError):
+        x = y = ""
+
+    sido = row.get("시도명", "").strip()
+    sigungu = row.get("시군구명", "").strip()
+    adong = row.get("행정동명", "").strip()
+    address = " ".join(p for p in [sido, sigungu, adong] if p) or None
+    road_address = row.get("도로명주소", "").strip() or None
+
+    return {
+        "source":       "gov_sangga",
+        "source_id":    row.get("상가업소번호", "").strip() or None,
+        "name":         full_name,
+        "category":     row.get("상권업종소분류명", "").strip() or None,
+        "phone":        "",
+        "address":      address or road_address or "",
+        "road_address": road_address or "",
+        "x":            x,
+        "y":            y,
+        "place_url":    "",
+        "crawled_at":   datetime.now(timezone.utc).isoformat(),
+        # Gov-specific metadata preserved for enrichment and provenance
+        "gov_업종코드":  row.get("상권업종소분류코드", "").strip(),
+        "gov_시군구":   sigungu,
+        "gov_우편번호":  row.get("신우편번호", "").strip(),
+    }
+
+
+def merge_into_studios_json(rows: list[dict], studios_json: Path) -> int:
+    """Convert gov rows to studio schema and merge with studios_raw.json.
+
+    Returns the number of studios after deduplication.
+    """
+    # Import dedup logic from the studios scraper
+    import importlib.util
+    scraper_path = Path(__file__).parent / "scrape_studios.py"
+    spec = importlib.util.spec_from_file_location("scrape_studios", scraper_path)
+    scraper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(scraper)
+
+    new_studios = [s for row in rows if (s := sangga_to_studio(row))]
+    log.info("Converted %d/%d gov rows to studio records", len(new_studios), len(rows))
+
+    existing: list[dict] = []
+    if studios_json.exists():
+        try:
+            existing = json.loads(studios_json.read_text(encoding="utf-8"))
+            log.info("Loaded %d existing studios from %s", len(existing), studios_json)
+        except Exception as exc:
+            log.warning("Could not read existing JSON (%s) — starting fresh", exc)
+
+    combined = existing + new_studios
+    deduped = scraper.deduplicate(combined)
+    log.info("After dedup: %d studios (%d new from gov)", len(deduped), len(new_studios))
+
+    studios_json.write_text(
+        json.dumps(deduped, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    log.info("Updated %s", studios_json)
+    return len(deduped)
+
+
 def save_csv(rows: list[dict], path: Path) -> None:
     COLS = [
         "상가업소번호", "상호명", "지점명",
@@ -228,6 +310,8 @@ def main() -> None:
                    help="Directory to save output CSV")
     p.add_argument("--load-db", action="store_true",
                    help="Upsert results into PostgreSQL after fetching")
+    p.add_argument("--merge-json", action="store_true",
+                   help="Merge results into studios_raw.json (runs enrichment pipeline next)")
     p.add_argument("--dry-run", action="store_true",
                    help="Print row counts only, do not save or insert")
     args = p.parse_args()
@@ -250,6 +334,10 @@ def main() -> None:
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     args.out_dir.mkdir(parents=True, exist_ok=True)
     save_csv(rows, args.out_dir / f"gov_sangga_{ts}.csv")
+
+    if args.merge_json:
+        studios_json = args.out_dir / "studios_raw.json"
+        merge_into_studios_json(rows, studios_json)
 
     if args.load_db:
         load_to_db(rows)

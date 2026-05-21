@@ -11,6 +11,7 @@
 #   bash /home/ubuntu/crawler/pipeline.sh
 #   bash /home/ubuntu/crawler/pipeline.sh --dry-run
 #   bash /home/ubuntu/crawler/pipeline.sh --only studios
+#   bash /home/ubuntu/crawler/pipeline.sh --only gov
 # =============================================================================
 
 set -euo pipefail
@@ -77,7 +78,7 @@ $DRY_RUN || S3_FLAG="--s3-sync"
 # ── 1. Studios (Kakao + Naver) ────────────────────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "studios" ]]; then
   echo ""
-  echo ">>> [1/3] Scraping yoga studios..."
+  echo ">>> [1/4] Scraping yoga studios..."
   python "$SCRIPTS_DIR/scrape_studios.py" \
     --all-cities \
     --delay 1.5 \
@@ -88,10 +89,27 @@ if [[ -z "$ONLY" || "$ONLY" == "studios" ]]; then
     || echo "    Studios: FAILED (continuing)"
 fi
 
+# ── 1b. 소상공인 Gov Data (merge into studios_raw.json) ───────────────────────
+if [[ -z "$ONLY" || "$ONLY" == "studios" || "$ONLY" == "gov" ]]; then
+  if [[ -n "${SANGGA_API_KEY:-}" ]]; then
+    echo ""
+    echo ">>> [1b/4] Merging 소상공인 gov data..."
+    python "$SCRIPTS_DIR/scrape_gov_sangga.py" \
+      --out-dir "$DATA_DIR/studios" \
+      --merge-json \
+      --delay 0.5 \
+      $DRY_FLAG \
+      && echo "    Gov sangga: OK" \
+      || echo "    Gov sangga: FAILED (continuing without gov data)"
+  else
+    echo ">>> [1b/4] Skipping 소상공인 (SANGGA_API_KEY not set)"
+  fi
+fi
+
 # ── 2. Instructors (Yoga Alliance + Instagram) ────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "instructors" ]]; then
   echo ""
-  echo ">>> [2/3] Scraping instructors..."
+  echo ">>> [2/4] Scraping instructors..."
   python "$SCRIPTS_DIR/scrape_instructors.py" \
     --source yogaalliance \
     --city Seoul \
@@ -115,7 +133,7 @@ fi
 # ── 3. Associations ───────────────────────────────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "associations" ]]; then
   echo ""
-  echo ">>> [3/3] Scraping associations..."
+  echo ">>> [3/4] Scraping associations..."
   python "$SCRIPTS_DIR/scrape_associations.py" \
     --source all \
     --pages 5 \
@@ -130,7 +148,7 @@ fi
 # ── 4. Load into PostgreSQL ───────────────────────────────────────────────────
 if ! $DRY_RUN && [[ -z "$ONLY" || "$ONLY" == "db" ]]; then
   echo ""
-  echo ">>> [4/4] Loading data into PostgreSQL..."
+  echo ">>> [4/4] Loading data into PostgreSQL (includes gov_sangga via studios_raw.json)..."
   python "$SCRIPTS_DIR/db_load.py" \
     --data-dir "$DATA_DIR" \
     && echo "    DB load: OK" \

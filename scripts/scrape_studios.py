@@ -43,6 +43,7 @@ import logging
 import math
 import os
 import random
+import re
 import subprocess
 import sys
 import time
@@ -125,6 +126,9 @@ SEOUL_DISTRICTS = [
 
 # ── Deduplication ─────────────────────────────────────────────────────────────
 
+_NAME_NOISE = re.compile(r"[\s\-_·•()\[\]【】（）]")
+
+
 def _coord_key(x: str, y: str, precision: int = 4) -> str:
     """Round coordinates to ~11m grid for deduplication."""
     try:
@@ -133,19 +137,72 @@ def _coord_key(x: str, y: str, precision: int = 4) -> str:
         return f"{x},{y}"
 
 
+def _normalize_name(name: str) -> str:
+    """Strip whitespace and punctuation for cross-source name matching.
+
+    Intentionally keeps suffixes like 요가원/스튜디오 so that '강남요가원' and
+    '강남요가스튜디오' are treated as distinct businesses (they might be), while
+    '강남요가스튜디오' appearing in both Kakao and gov_sangga still collapses.
+    """
+    return _NAME_NOISE.sub("", name.strip()).lower()
+
+
+def _extract_district(s: dict) -> str:
+    """Return the 시군구 token from address fields (or gov_시군구 if present)."""
+    if s.get("gov_시군구"):
+        return s["gov_시군구"]
+    addr = s.get("road_address") or s.get("address") or ""
+    # Korean addresses: 서울특별시 종로구 … → take the second space-delimited token
+    parts = addr.split()
+    return parts[1] if len(parts) > 1 else ""
+
+
+def _field_score(s: dict) -> int:
+    """Count non-empty fields as a proxy for record richness."""
+    return sum(1 for v in s.values() if v and v not in ("", [], {}))
+
+
 def deduplicate(studios: list[dict]) -> list[dict]:
-    """Keep one record per coordinate cell; prefer records with phone numbers."""
-    seen: dict[str, dict] = {}
+    """Deduplicate studios by coordinate grid, then by normalised name+district.
+
+    Two passes:
+    1. Coordinate key at ~11 m precision — catches repeated API results.
+    2. Normalised name + 시군구 — catches same business from different sources
+       (e.g. Kakao vs 소상공인) when coordinates differ by more than 11 m.
+       Only applied when the normalised name is ≥ 4 chars to avoid false merges
+       on generic names like '요가원'.
+    """
+    by_coord: dict[str, dict] = {}
+    # maps (norm_name, district) -> coord_key of the winning record
+    by_name_district: dict[tuple[str, str], str] = {}
+
     for s in studios:
-        key = _coord_key(s.get("x", ""), s.get("y", ""))
-        if key not in seen:
-            seen[key] = s
-        else:
-            # Prefer record with more fields populated
-            existing = seen[key]
-            if len([v for v in s.values() if v]) > len([v for v in existing.values() if v]):
-                seen[key] = s
-    return list(seen.values())
+        coord_key = _coord_key(s.get("x", ""), s.get("y", ""))
+        norm = _normalize_name(s.get("name", ""))
+        district = _extract_district(s)
+        name_key: tuple[str, str] | None = (norm, district) if len(norm) >= 4 else None
+
+        if coord_key in by_coord:
+            existing = by_coord[coord_key]
+            if _field_score(s) > _field_score(existing):
+                by_coord[coord_key] = s
+            continue
+
+        if name_key and name_key in by_name_district:
+            existing_coord = by_name_district[name_key]
+            existing = by_coord.get(existing_coord)
+            if existing and _field_score(s) > _field_score(existing):
+                # Replace the old record with the richer one at the new coord key
+                del by_coord[existing_coord]
+                by_coord[coord_key] = s
+                by_name_district[name_key] = coord_key
+            continue
+
+        by_coord[coord_key] = s
+        if name_key:
+            by_name_district[name_key] = coord_key
+
+    return list(by_coord.values())
 
 
 # ── Kakao Local API ───────────────────────────────────────────────────────────
