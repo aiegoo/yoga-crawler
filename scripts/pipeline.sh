@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# pipeline.sh — Yoga Resource Crawl Pipeline
+# pipeline.sh — Yoga Resource Crawl Pipeline (parallel edition)
 # Runs on EC2 (ubuntu@ip-172-31-32-23, ap-northeast-2)
 #
 # Schedule (crontab -e):
@@ -8,14 +8,22 @@
 #   (18:00 UTC = 03:00 KST)
 #
 # Manual run:
-#   bash /home/ubuntu/crawler/pipeline.sh
-#   bash /home/ubuntu/crawler/pipeline.sh --dry-run
-#   bash /home/ubuntu/crawler/pipeline.sh --only studios
+#   bash pipeline.sh                         # full parallel run
+#   bash pipeline.sh --dry-run               # log commands, no API calls
+#   bash pipeline.sh --only studios          # single step
+#   bash pipeline.sh --only gov              # force gov refresh
+#   bash pipeline.sh --only github           # force GitHub mine
+#   bash pipeline.sh --sequential            # disable parallelism (for debugging)
+#
+# Parallel execution plan:
+#   Tier 1 (parallel): studios · instructors · associations
+#   Tier 1b (serial):  gov_sangga --merge-json   (needs studios_raw.json)
+#   Tier 2 (serial):   db_load                   (needs all JSON files)
+#   Tier 3 (parallel): scrape_web · scrape_ig_profiles
+#   Tier 4 (scheduled):scrape_github_yoga (weekly) · gov --load-db (monthly)
 # =============================================================================
 
 set -euo pipefail
-
-# Ensure aws CLI is on PATH for cron (cron uses minimal PATH)
 export PATH="/usr/local/bin:$PATH"
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -31,12 +39,14 @@ RUN_ID=$(date -u +%Y%m%dT%H%M%SZ)
 
 DRY_RUN=false
 ONLY=""
+PARALLEL=true
 
 # ── Parse args ────────────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --dry-run) DRY_RUN=true; shift ;;
-    --only)    ONLY="$2"; shift 2 ;;
+    --dry-run)    DRY_RUN=true;  shift ;;
+    --only)       ONLY="$2";     shift 2 ;;
+    --sequential) PARALLEL=false; shift ;;
     *) echo "Unknown arg: $1"; exit 1 ;;
   esac
 done
@@ -47,10 +57,11 @@ exec > >(tee -a "$LOG_DIR/pipeline-${RUN_ID}.log") 2>&1
 
 echo "=============================="
 echo "Yoga Crawl Pipeline"
-echo "Run ID : $RUN_ID"
-echo "Date   : $DATE"
-echo "Dry run: $DRY_RUN"
-echo "Only   : ${ONLY:-all}"
+echo "Run ID     : $RUN_ID"
+echo "Date       : $DATE"
+echo "Dry run    : $DRY_RUN"
+echo "Only       : ${ONLY:-all}"
+echo "Parallel   : $PARALLEL"
 echo "=============================="
 
 # Load env vars from /etc/environment (API keys)
@@ -59,164 +70,228 @@ set -a
 source /etc/environment 2>/dev/null || true
 set +a
 
-# Pull latest code from git
-echo ">>> [0/4] git pull..."
+# Pull latest code
+echo ">>> [0] git pull..."
 git -C "$REPO_DIR" pull --ff-only origin master \
   && echo "    git pull: OK" \
   || echo "    git pull: FAILED (continuing with local code)"
 
-# Activate Python virtualenv
 source "$VENV_DIR/bin/activate"
-
 cd "$REPO_DIR"
 export PYTHONPATH="$SCRIPTS_DIR"
 
 DRY_FLAG=""
 $DRY_RUN && DRY_FLAG="--dry-run"
 
-S3_FLAG=""
-$DRY_RUN || S3_FLAG="--s3-sync"
+# ── Parallel job helpers ───────────────────────────────────────────────────────
 
-# ── 1. Studios (Kakao + Naver) ────────────────────────────────────────────────
-if [[ -z "$ONLY" || "$ONLY" == "studios" ]]; then
-  echo ""
-  echo ">>> [1/3] Scraping yoga studios (batched by city to limit memory)..."
-  # Run in 5 batches of 5 cities — avoids OOM on t3.micro (1 GB RAM)
-  # scrape_studios.py merges with existing studios_raw.json on each run
-  declare -a CITY_BATCHES=(
-    "Seoul Busan Daegu Incheon Gwangju"
-    "Daejeon Ulsan Suwon Changwon Seongnam"
-    "Goyang Yongin Bucheon Cheongju Ansan"
-    "Jeonju Anyang Cheonan Namyangju Hwaseong"
-    "Jeju Gimhae Hanam Uijeongbu Siheung"
-  )
-  STUDIO_STATUS="OK"
-  for batch in "${CITY_BATCHES[@]}"; do
-    # shellcheck disable=SC2086
-    python "$SCRIPTS_DIR/scrape_studios.py" \
-      --cities $batch \
-      --delay 1.5 \
-      --out-dir "$DATA_DIR/studios" \
-      $DRY_FLAG \
-      || { STUDIO_STATUS="FAILED"; echo "    Batch [$batch] FAILED (continuing)"; }
+# Arrays tracking in-flight background jobs
+_BG_PIDS=()
+_BG_NAMES=()
+_BG_LOGS=()
+
+# launch <name> <cmd...>
+# Runs <cmd> in the background with its own log file.
+# When PARALLEL=false, runs synchronously instead.
+launch() {
+  local name="$1"; shift
+  local log="$LOG_DIR/${name}-${RUN_ID}.log"
+  if $PARALLEL; then
+    echo "    [bg] $name → $(basename "$log")"
+    # Run in a subshell so set -e inside doesn't kill the parent
+    (set +e; "$@") >"$log" 2>&1 &
+    _BG_PIDS+=("$!")
+    _BG_NAMES+=("$name")
+    _BG_LOGS+=("$log")
+  else
+    echo "    [seq] $name"
+    "$@" 2>&1 | tee "$log" || true
+  fi
+}
+
+# collect — wait for all launched background jobs and print results.
+# Prints last 15 lines of the log for any failed job.
+# Returns 1 if any job failed, 0 if all succeeded.
+collect() {
+  [[ ${#_BG_PIDS[@]} -eq 0 ]] && return 0
+  local rc=0
+  for i in "${!_BG_PIDS[@]}"; do
+    local pid="${_BG_PIDS[$i]}"
+    local name="${_BG_NAMES[$i]}"
+    local log="${_BG_LOGS[$i]}"
+    if wait "$pid"; then
+      echo "    ✓ $name: OK"
+    else
+      echo "    ✗ $name: FAILED"
+      echo "      ── last lines of $log ──"
+      tail -n 15 "$log" | sed 's/^/      /'
+      rc=1
+    fi
   done
-  # S3 sync once after all batches complete
-  if [[ "$STUDIO_STATUS" == "OK" ]] && ! $DRY_RUN; then
-    aws s3 sync "$DATA_DIR/studios/" \
-      "s3://${S3_BUCKET}/${DATE}/studios/" \
-      --exclude "*.sql" \
-      --region "$REGION" \
-      && echo "    Studios S3 sync: OK" \
-      || echo "    Studios S3 sync: FAILED"
-  fi
-  echo "    Studios: $STUDIO_STATUS"
+  _BG_PIDS=(); _BG_NAMES=(); _BG_LOGS=()
+  return $rc
+}
+
+# ── TIER 1 — parallel scrapers ────────────────────────────────────────────────
+echo ""
+echo ">>> TIER 1 — launching scrapers in parallel..."
+
+# 1a. Studios (5 city batches run sequentially within this job)
+if [[ -z "$ONLY" || "$ONLY" == "studios" ]]; then
+  launch "studios" bash -c "
+    set -euo pipefail
+    source '$VENV_DIR/bin/activate'
+    declare -a BATCHES=(
+      'Seoul Busan Daegu Incheon Gwangju'
+      'Daejeon Ulsan Suwon Changwon Seongnam'
+      'Goyang Yongin Bucheon Cheongju Ansan'
+      'Jeonju Anyang Cheonan Namyangju Hwaseong'
+      'Jeju Gimhae Hanam Uijeongbu Siheung'
+    )
+    for batch in \"\${BATCHES[@]}\"; do
+      python '$SCRIPTS_DIR/scrape_studios.py' \
+        --cities \$batch \
+        --delay 1.5 \
+        --out-dir '$DATA_DIR/studios' \
+        $DRY_FLAG \
+        || echo \"  Batch [\$batch] FAILED (continuing)\"
+    done
+    if [[ '$DRY_RUN' != 'true' ]]; then
+      aws s3 sync '$DATA_DIR/studios/' \
+        's3://${S3_BUCKET}/${DATE}/studios/' \
+        --exclude '*.sql' --region '$REGION' \
+        && echo '  Studios S3 sync: OK' \
+        || echo '  Studios S3 sync: FAILED'
+    fi
+  "
 fi
 
-# ── 2. Instructors (Yoga Alliance + Instagram) ────────────────────────────────
+# 1b. Instructors
 if [[ -z "$ONLY" || "$ONLY" == "instructors" ]]; then
-  echo ""
-  echo ">>> [2/3] Scraping instructors..."
-  python "$SCRIPTS_DIR/scrape_instructors.py" \
-    --source yogaalliance \
-    --city Seoul \
-    --pages 5 \
-    --delay 2.0 \
-    $DRY_FLAG \
-    && echo "    Instructors: OK" \
-    || echo "    Instructors: FAILED (continuing)"
+  launch "instructors" bash -c "
+    set -euo pipefail
+    source '$VENV_DIR/bin/activate'
+    python '$SCRIPTS_DIR/scrape_instructors.py' \
+      --source yogaalliance \
+      --city Seoul \
+      --pages 5 \
+      --delay 2.0 \
+      $DRY_FLAG
+    if [[ '$DRY_RUN' != 'true' ]]; then
+      aws s3 sync '$DATA_DIR/instructors/' \
+        's3://${S3_BUCKET}/${DATE}/instructors/' \
+        --exclude '*.sql' --region '$REGION'
+    fi
+  "
+fi
 
-  # Sync instructors to S3
-  if ! $DRY_RUN; then
-    aws s3 sync "$DATA_DIR/instructors/" \
-      "s3://${S3_BUCKET}/${DATE}/instructors/" \
-      --exclude "*.sql" \
-      --region "$REGION" \
-      && echo "    Instructors S3 sync: OK" \
-      || echo "    Instructors S3 sync: FAILED"
+# 1c. Associations
+if [[ -z "$ONLY" || "$ONLY" == "associations" ]]; then
+  launch "associations" bash -c "
+    set -euo pipefail
+    source '$VENV_DIR/bin/activate'
+    python '$SCRIPTS_DIR/scrape_associations.py' \
+      --source all \
+      --pages 5 \
+      --delay 2.0 \
+      --out-dir '$DATA_DIR/associations' \
+      $DRY_FLAG
+    if [[ '$DRY_RUN' != 'true' ]]; then
+      aws s3 sync '$DATA_DIR/associations/' \
+        's3://${S3_BUCKET}/${DATE}/associations/' \
+        --exclude '*.sql' --region '$REGION'
+    fi
+  "
+fi
+
+collect || echo "    Some Tier 1 scrapers failed — continuing to Tier 1b"
+
+# ── TIER 1b — gov merge (depends on studios_raw.json from Tier 1) ────────────
+if [[ -z "$ONLY" || "$ONLY" == "studios" || "$ONLY" == "gov" ]]; then
+  if [[ -n "${SANGGA_API_KEY:-}" ]]; then
+    echo ""
+    echo ">>> TIER 1b — 소상공인 gov merge..."
+    python "$SCRIPTS_DIR/scrape_gov_sangga.py" \
+      --out-dir "$DATA_DIR/studios" \
+      --merge-json \
+      --delay 0.5 \
+      $DRY_FLAG \
+      && echo "    ✓ gov_sangga merge: OK" \
+      || echo "    ✗ gov_sangga merge: FAILED (continuing)"
+  else
+    echo ""
+    echo ">>> TIER 1b — skipping 소상공인 (SANGGA_API_KEY not set)"
   fi
 fi
 
-# ── 3. Associations ───────────────────────────────────────────────────────────
-if [[ -z "$ONLY" || "$ONLY" == "associations" ]]; then
-  echo ""
-  echo ">>> [3/3] Scraping associations..."
-  python "$SCRIPTS_DIR/scrape_associations.py" \
-    --source all \
-    --pages 5 \
-    --delay 2.0 \
-    $DRY_FLAG \
-    $S3_FLAG \
-    && echo "    Associations: OK" \
-    || echo "    Associations: FAILED (continuing)"
-fi
-
-# ── 4. Load into PostgreSQL ───────────────────────────────────────────────────
+# ── TIER 2 — DB load (depends on all Tier 1 JSON output) ─────────────────────
 if ! $DRY_RUN && [[ -z "$ONLY" || "$ONLY" == "db" ]]; then
   echo ""
-  echo ">>> [4/4] Loading data into PostgreSQL..."
+  echo ">>> TIER 2 — loading all data into PostgreSQL..."
   python "$SCRIPTS_DIR/db_load.py" \
     --data-dir "$DATA_DIR" \
-    && echo "    DB load: OK" \
-    || echo "    DB load: FAILED (data still in S3)"
+    && echo "    ✓ db_load: OK" \
+    || echo "    ✗ db_load: FAILED (data still in S3)"
 fi
 
-# ── Summary ───────────────────────────────────────────────────────────────────
-echo ""
-echo "=============================="
-echo "Pipeline complete: $RUN_ID"
-
+# ── TIER 3 — parallel post-processors (depend on DB) ─────────────────────────
 if ! $DRY_RUN; then
-  STUDIO_COUNT=$(python3 -c "
-import json, pathlib
-f = pathlib.Path('data/studios/studios_raw.json')
-print(len(json.loads(f.read_text())) if f.exists() else 0)
-" 2>/dev/null || echo 0)
-
-  INSTRUCTOR_COUNT=$(python3 -c "
-import json, pathlib
-f = pathlib.Path('data/instructors/instructors_raw.json')
-print(len(json.loads(f.read_text())) if f.exists() else 0)
-" 2>/dev/null || echo 0)
-
-  ASSOC_COUNT=$(python3 -c "
-import json, pathlib
-f = pathlib.Path('data/associations/associations_raw.json')
-print(len(json.loads(f.read_text())) if f.exists() else 0)
-" 2>/dev/null || echo 0)
-
-  echo "  Studios      : $STUDIO_COUNT"
-  echo "  Instructors  : $INSTRUCTOR_COUNT"
-  echo "  Associations : $ASSOC_COUNT"
   echo ""
-  echo "  S3 bucket    : s3://${S3_BUCKET}/${DATE}/"
+  echo ">>> TIER 3 — launching post-processors in parallel..."
+
+  if [[ -z "$ONLY" || "$ONLY" == "web" ]]; then
+    launch "scrape_web" bash -c "
+      set -euo pipefail
+      source '$VENV_DIR/bin/activate'
+      python '$SCRIPTS_DIR/scrape_web.py' \
+        --limit 200 \
+        --delay 1.5 \
+        $DRY_FLAG
+    "
+  fi
+
+  if [[ -z "$ONLY" || "$ONLY" == "instagram" || "$ONLY" == "ig" ]]; then
+    IG_MODE="oembed"
+    [[ -n "${INSTAGRAM_SESSION_ID:-}" ]] && IG_MODE="instaloader"
+    [[ -n "${APIFY_TOKEN:-}" ]]          && IG_MODE="apify"
+    launch "scrape_ig" bash -c "
+      set -euo pipefail
+      source '$VENV_DIR/bin/activate'
+      python '$SCRIPTS_DIR/scrape_ig_profiles.py' \
+        --mode '$IG_MODE' \
+        --limit 300 \
+        --delay 8 \
+        --discover \
+        $DRY_FLAG
+    "
+  fi
+
+  collect || echo "    Some Tier 3 post-processors failed — continuing"
 fi
-echo "=============================="
 
-# ── 5. Gov sangga (소상공인마당) — monthly refresh ────────────────────────────
-# Runs automatically on day 1 of each month, OR when --only gov is passed.
-# Requires SANGGA_API_KEY env var (free API key from https://data.go.kr).
-# Register at: https://www.data.go.kr/data/15012005/openapi.do
-if [[ -z "$ONLY" && "$(date -u +%d)" == "01" ]] || [[ "$ONLY" == "gov" ]]; then
+# ── TIER 4a — gov full refresh (monthly, --load-db path) ─────────────────────
+if [[ ( -z "$ONLY" && "$(date -u +%d)" == "01" ) || "$ONLY" == "gov" ]]; then
   echo ""
-  echo ">>> [5/5] Gov sangga monthly refresh (소상공인 상가정보 API)..."
+  echo ">>> TIER 4a — gov sangga monthly refresh (소상공인 --load-db)..."
 
   if [[ -z "${SANGGA_API_KEY:-}" ]]; then
-    echo "    SKIPPED — SANGGA_API_KEY not set."
-    echo "    To enable: sudo sh -c 'echo SANGGA_API_KEY=your_key >> /etc/environment'"
+    echo "    SKIPPED — SANGGA_API_KEY not set"
+    echo "    Register free at https://www.data.go.kr/data/15012005/openapi.do"
+    echo "    Then: sudo sh -c 'echo SANGGA_API_KEY=your_key >> /etc/environment'"
   else
     python "$SCRIPTS_DIR/scrape_gov_sangga.py" \
+      --out-dir "$DATA_DIR/studios" \
       --load-db \
       --delay 0.5 \
       $DRY_FLAG \
-      && echo "    Gov sangga: OK" \
-      || echo "    Gov sangga: FAILED (continuing)"
+      && echo "    ✓ gov_sangga --load-db: OK" \
+      || echo "    ✗ gov_sangga --load-db: FAILED"
 
-    # Cross-reference after load
     if ! $DRY_RUN; then
       python "$SCRIPTS_DIR/crossref_gov_kakao.py" \
         --out-dir "$DATA_DIR" \
-        && echo "    Crossref: OK" \
-        || echo "    Crossref: FAILED"
+        && echo "    ✓ crossref: OK" \
+        || echo "    ✗ crossref: FAILED (script may not exist yet)"
 
       aws s3 cp "$DATA_DIR/crossref_report_$(date -u +%Y%m%d).csv" \
         "s3://${S3_BUCKET}/${DATE}/reports/" \
@@ -225,54 +300,36 @@ if [[ -z "$ONLY" && "$(date -u +%d)" == "01" ]] || [[ "$ONLY" == "gov" ]]; then
   fi
 fi
 
-# ── 6. Website page crawler ───────────────────────────────────────────────────
-# Crawls known studio websites for class schedules, prices, teacher bios, booking URLs
-# Runs daily — processes up to 200 unenriched studios per run
-if [[ -z "$ONLY" || "$ONLY" == "web" ]]; then
-  echo ""
-  echo ">>> [6/8] Website crawler (studio pages, schedules, prices)..."
-  python "$SCRIPTS_DIR/scrape_web.py" \
-    --limit 200 \
-    --delay 1.5 \
-    $DRY_FLAG \
-    && echo "    Web crawler: OK" \
-    || echo "    Web crawler: FAILED (continuing)"
-fi
-
-# ── 7. Instagram profile harvester ───────────────────────────────────────────
-# Fetches follower count, bio, recent hashtags from known studio IG handles
-# Uses instaloader (session cookie) if INSTAGRAM_SESSION_ID set, else oEmbed
-if [[ -z "$ONLY" || "$ONLY" == "instagram" || "$ONLY" == "ig" ]]; then
-  echo ""
-  echo ">>> [7/8] Instagram profile harvest..."
-  IG_MODE="oembed"
-  [[ -n "${INSTAGRAM_SESSION_ID:-}" ]] && IG_MODE="instaloader"
-  [[ -n "${APIFY_TOKEN:-}" ]]          && IG_MODE="apify"
-  echo "    IG mode: $IG_MODE"
-  python "$SCRIPTS_DIR/scrape_ig_profiles.py" \
-    --mode "$IG_MODE" \
-    --limit 300 \
-    --delay 8 \
-    --discover \
-    $DRY_FLAG \
-    && echo "    Instagram: OK" \
-    || echo "    Instagram: FAILED (continuing)"
-fi
-
-# ── 8. GitHub yoga profile miner ─────────────────────────────────────────────
-# Mines GitHub Search API for yoga/yoga-alliance devs, orgs, and repos
-# Requires GITHUB_TOKEN for 5,000 req/hr (without token: 60 req/hr)
-# Runs weekly on Sunday only to avoid rate limits
+# ── TIER 4b — GitHub mining (weekly, Sundays) ─────────────────────────────────
 if [[ ( -z "$ONLY" && "$(date -u +%u)" == "7" ) || "$ONLY" == "github" ]]; then
   echo ""
-  echo ">>> [8/8] GitHub yoga profile mine..."
-  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
-    echo "    NOTE: GITHUB_TOKEN not set — rate-limited to 60 req/hr"
-    echo "    Set at: https://github.com/settings/tokens (no scopes needed)"
-  fi
+  echo ">>> TIER 4b — GitHub yoga profile mine..."
+  [[ -z "${GITHUB_TOKEN:-}" ]] \
+    && echo "    NOTE: GITHUB_TOKEN not set — rate-limited to 60 req/hr"
   python "$SCRIPTS_DIR/scrape_github_yoga.py" \
     --out-dir "$DATA_DIR/github" \
     $DRY_FLAG \
-    && echo "    GitHub mine: OK" \
-    || echo "    GitHub mine: FAILED (continuing)"
+    && echo "    ✓ github: OK" \
+    || echo "    ✗ github: FAILED (continuing)"
 fi
+
+# ── Summary ───────────────────────────────────────────────────────────────────
+echo ""
+echo "=============================="
+echo "Pipeline complete: $RUN_ID"
+
+if ! $DRY_RUN; then
+  _count() { python3 -c "
+import json, pathlib
+f = pathlib.Path('$1')
+print(len(json.loads(f.read_text())) if f.exists() else 0)
+" 2>/dev/null || echo 0; }
+
+  echo "  Studios      : $(_count data/studios/studios_raw.json)"
+  echo "  Instructors  : $(_count data/instructors/instructors_raw.json)"
+  echo "  Associations : $(_count data/associations/associations_raw.json)"
+  echo ""
+  echo "  Logs in      : $LOG_DIR/  (*-${RUN_ID}.log)"
+  echo "  S3 bucket    : s3://${S3_BUCKET}/${DATE}/"
+fi
+echo "=============================="
