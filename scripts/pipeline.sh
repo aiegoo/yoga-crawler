@@ -60,13 +60,19 @@ source /etc/environment 2>/dev/null || true
 set +a
 
 # Pull latest code from git
-echo ">>> [0/4] git pull..."
+echo ">>> [0/8] git pull..."
 git -C "$REPO_DIR" pull --ff-only origin master \
   && echo "    git pull: OK" \
   || echo "    git pull: FAILED (continuing with local code)"
 
 # Activate Python virtualenv
 source "$VENV_DIR/bin/activate"
+
+# Ensure dependencies are up to date
+echo ">>> pip install..."
+pip install -q -r "$REPO_DIR/requirements.txt" \
+  && echo "    pip install: OK" \
+  || echo "    pip install: FAILED (continuing with existing packages)"
 
 cd "$REPO_DIR"
 export PYTHONPATH="$SCRIPTS_DIR"
@@ -80,7 +86,7 @@ $DRY_RUN || S3_FLAG="--s3-sync"
 # ── 1. Studios (Kakao + Naver) ────────────────────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "studios" ]]; then
   echo ""
-  echo ">>> [1/3] Scraping yoga studios (batched by city to limit memory)..."
+  echo ">>> [1/8] Scraping yoga studios (batched by city to limit memory)..."
   # Run in 5 batches of 5 cities — avoids OOM on t3.micro (1 GB RAM)
   # scrape_studios.py merges with existing studios_raw.json on each run
   declare -a CITY_BATCHES=(
@@ -115,7 +121,7 @@ fi
 # ── 2. Instructors (Yoga Alliance + Instagram) ────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "instructors" ]]; then
   echo ""
-  echo ">>> [2/3] Scraping instructors..."
+  echo ">>> [2/8] Scraping instructors..."
   python "$SCRIPTS_DIR/scrape_instructors.py" \
     --source yogaalliance \
     --city Seoul \
@@ -139,11 +145,12 @@ fi
 # ── 3. Associations ───────────────────────────────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "associations" ]]; then
   echo ""
-  echo ">>> [3/3] Scraping associations..."
+  echo ">>> [3/8] Scraping associations..."
   python "$SCRIPTS_DIR/scrape_associations.py" \
     --source all \
     --pages 5 \
     --delay 2.0 \
+    --out-dir "$DATA_DIR/associations" \
     $DRY_FLAG \
     $S3_FLAG \
     && echo "    Associations: OK" \
@@ -153,7 +160,7 @@ fi
 # ── 4. Load into PostgreSQL ───────────────────────────────────────────────────
 if ! $DRY_RUN && [[ -z "$ONLY" || "$ONLY" == "db" ]]; then
   echo ""
-  echo ">>> [4/4] Loading data into PostgreSQL..."
+  echo ">>> [4/8] Loading data into PostgreSQL..."
   python "$SCRIPTS_DIR/db_load.py" \
     --data-dir "$DATA_DIR" \
     && echo "    DB load: OK" \
@@ -198,7 +205,7 @@ echo "=============================="
 # Register at: https://www.data.go.kr/data/15012005/openapi.do
 if [[ -z "$ONLY" && "$(date -u +%d)" == "01" ]] || [[ "$ONLY" == "gov" ]]; then
   echo ""
-  echo ">>> [5/5] Gov sangga monthly refresh (소상공인 상가정보 API)..."
+  echo ">>> [5/8] Gov sangga monthly refresh (소상공인 상가정보 API)..."
 
   if [[ -z "${SANGGA_API_KEY:-}" ]]; then
     echo "    SKIPPED — SANGGA_API_KEY not set."

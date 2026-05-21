@@ -61,7 +61,7 @@ def get_conn():
         port=int(os.environ.get("PGPORT", "5432")),
         dbname=os.environ.get("PGDATABASE", "yogacrawl"),
         user=os.environ.get("PGUSER", "yogacrawl"),
-        password=os.environ.get("PGPASSWORD", "yogacrawl"),
+        password=os.environ.get("PGPASSWORD"),
     )
 
 
@@ -389,13 +389,15 @@ def main() -> None:
         totals["classes"] = load_classes(conn, path, args.dry_run)
 
     if conn:
-        # Print summary
-        with conn.cursor() as cur:
-            cur.execute("SELECT * FROM data_summary ORDER BY \"table\"")
-            rows = cur.fetchall()
-            log.info("── DB Summary ──────────────────")
-            for table, count in rows:
-                log.info("  %-15s %d rows", table, count)
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM data_summary ORDER BY \"table\"")
+                rows = cur.fetchall()
+                log.info("── DB Summary ──────────────────")
+                for table, count in rows:
+                    log.info("  %-15s %d rows", table, count)
+        except Exception as exc:
+            log.warning("Could not fetch data_summary (view may not exist): %s", exc)
         conn.close()
 
     log.info("Load complete: %s", totals)

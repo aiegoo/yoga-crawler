@@ -57,7 +57,7 @@ source /etc/environment 2>/dev/null || true
 set +a
 
 # Pull latest code from git
-echo ">>> [0/4] git pull..."
+echo ">>> [0/4] git pull (use scripts/pipeline.sh for full 8-step run)..."
 git -C "$REPO_DIR" pull --ff-only origin master \
   && echo "    git pull: OK" \
   || echo "    git pull: FAILED (continuing with local code)"
@@ -77,7 +77,7 @@ $DRY_RUN || S3_FLAG="--s3-sync"
 # ── 1. Studios (Kakao + Naver) ────────────────────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "studios" ]]; then
   echo ""
-  echo ">>> [1/3] Scraping yoga studios..."
+  echo ">>> [1/4] Scraping yoga studios..."
   python "$SCRIPTS_DIR/scrape_studios.py" \
     --all-cities \
     --delay 1.5 \
@@ -91,7 +91,7 @@ fi
 # ── 2. Instructors (Yoga Alliance + Instagram) ────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "instructors" ]]; then
   echo ""
-  echo ">>> [2/3] Scraping instructors..."
+  echo ">>> [2/4] Scraping instructors..."
   python "$SCRIPTS_DIR/scrape_instructors.py" \
     --source yogaalliance \
     --city Seoul \
@@ -115,7 +115,7 @@ fi
 # ── 3. Associations ───────────────────────────────────────────────────────────
 if [[ -z "$ONLY" || "$ONLY" == "associations" ]]; then
   echo ""
-  echo ">>> [3/3] Scraping associations..."
+  echo ">>> [3/4] Scraping associations..."
   python "$SCRIPTS_DIR/scrape_associations.py" \
     --source all \
     --pages 5 \

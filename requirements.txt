@@ -3,3 +3,6 @@ beautifulsoup4>=4.12.0
 boto3>=1.34.0
 lxml>=5.0.0
 instaloader>=4.10.0
+psycopg2-binary>=2.9.0
+gspread>=6.0.0
+google-auth-oauthlib>=1.2.0

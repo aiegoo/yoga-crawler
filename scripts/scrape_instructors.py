@@ -42,6 +42,7 @@ import argparse
 import json
 import logging
 import math
+import os
 import random
 import re
 import sys
@@ -49,8 +50,6 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-
-import os
 
 import httpx
 from bs4 import BeautifulSoup
@@ -116,54 +115,51 @@ def scrape_yoga_alliance(city: str, pages: int, delay: float) -> list[dict]:
     Pagination is via `?page=N` query param.
     """
     results: list[dict] = []
-    client = httpx.Client(headers=YA_HEADERS, timeout=15, follow_redirects=True)
+    with httpx.Client(headers=YA_HEADERS, timeout=15, follow_redirects=True) as client:
+        for page in range(1, pages + 1):
+            url = f"{YA_SEARCH_URL}?city={city}&type=RYT&page={page}"
+            log.info("YA page %d → %s", page, url)
 
-    for page in range(1, pages + 1):
-        url = f"{YA_SEARCH_URL}?city={city}&type=RYT&page={page}"
-        log.info("YA page %d → %s", page, url)
+            try:
+                resp = client.get(url)
+                resp.raise_for_status()
+            except httpx.HTTPError as exc:
+                log.warning("HTTP error on page %d: %s", page, exc)
+                break
 
-        try:
-            resp = client.get(url)
-            resp.raise_for_status()
-        except httpx.HTTPError as exc:
-            log.warning("HTTP error on page %d: %s", page, exc)
-            break
+            # Detect YA policy-redirect (directory access removed without login)
+            if "directory-listing-policy" in str(resp.url) or "policies-priorities" in str(resp.url):
+                log.warning(
+                    "Yoga Alliance redirected to policy page — directory is no longer publicly accessible. "
+                    "URL: %s", resp.url
+                )
+                break
 
-        # Detect YA policy-redirect (directory access removed without login)
-        if "directory-listing-policy" in str(resp.url) or "policies-priorities" in str(resp.url):
-            log.warning(
-                "Yoga Alliance redirected to policy page — directory is no longer publicly accessible. "
-                "URL: %s", resp.url
+            soup = BeautifulSoup(resp.text, "html.parser")
+
+            # Each instructor card — selector may need updating if YA redesigns their page
+            cards = (
+                soup.select("div.teacher-card")
+                or soup.select("li.directory-result")
+                or soup.select("[class*='instructor']")
+                or soup.select("[class*='teacher']")
             )
-            break
 
-        soup = BeautifulSoup(resp.text, "html.parser")
+            if not cards:
+                log.info("No cards found on page %d — may be last page or selector mismatch", page)
+                snippet = resp.text[:500].replace("\n", " ")
+                log.debug("HTML snippet: %s", snippet)
+                break
 
-        # Each instructor card — selector may need updating if YA redesigns their page
-        cards = (
-            soup.select("div.teacher-card")
-            or soup.select("li.directory-result")
-            or soup.select("[class*='instructor']")
-            or soup.select("[class*='teacher']")
-        )
+            for card in cards:
+                instructor = _parse_ya_card(card)
+                if instructor:
+                    results.append(instructor)
 
-        if not cards:
-            log.info("No cards found on page %d — may be last page or selector mismatch", page)
-            # Dump a snippet for debugging
-            snippet = resp.text[:500].replace("\n", " ")
-            log.debug("HTML snippet: %s", snippet)
-            break
+            log.info("  → %d instructors collected so far", len(results))
+            jitter = random.uniform(0.5, delay)
+            time.sleep(jitter)
 
-        for card in cards:
-            instructor = _parse_ya_card(card)
-            if instructor:
-                results.append(instructor)
-
-        log.info("  → %d instructors collected so far", len(results))
-        jitter = random.uniform(0.5, delay)
-        time.sleep(jitter)
-
-    client.close()
     return results
 
 
@@ -355,47 +351,56 @@ def scrape_naver_instructors(cities=None, delay=1.5):
     for city in cities:
         for keyword in INSTRUCTOR_KEYWORDS:
             query = f"{city} {keyword}"
-            params = {"query": query, "display": 5, "start": 1, "sort": "comment"}
-            try:
-                resp = client.get(NAVER_LOCAL_URL, params=params)
-                resp.raise_for_status()
-                items = resp.json().get("items", [])
-            except Exception as exc:
-                log.warning("Naver '%s' error: %s", query, exc)
-                continue
-            log.info("Naver '%s' → %d items", query, len(items))
-            for item in items:
-                name = re.sub(r"<[^>]+>", "", item.get("title", "")).strip()
-                if not name:
-                    continue
-                inst_id = re.sub(r"[^a-z0-9]+", "-", (name + "-" + city).lower()).strip("-")
-                if inst_id in seen_ids:
-                    continue
-                seen_ids.add(inst_id)
-                desc = item.get("description", "") or ""
-                addr = item.get("roadAddress") or item.get("address") or ""
-                results.append({
-                    "instructor_id":       inst_id,
-                    "full_name":           name,
-                    "bio":                 desc or None,
-                    "certification_level": None,
-                    "yoga_alliance_id":    None,
-                    "lineage_school":      None,
-                    "lineage_depth":       0,
-                    "city":                city,
-                    "country":             "KR",
-                    "address":             addr or None,
-                    "telephone":           item.get("telephone") or None,
-                    "naver_link":          item.get("link") or None,
-                    "instagram_handle":    None,
-                    "instagram_followers": None,
-                    "specialties":         _infer_specialties_from_bio(desc),
-                    "avg_rating":          None,
-                    "review_count":        0,
-                    "data_source":         "naver_local",
-                    "scraped_at":          datetime.now(timezone.utc).isoformat(),
-                })
-            time.sleep(random.uniform(0.4, delay))
+            start = 1
+            while start <= 100:
+                params = {"query": query, "display": 5, "start": start, "sort": "comment"}
+                try:
+                    resp = client.get(NAVER_LOCAL_URL, params=params)
+                    resp.raise_for_status()
+                    data = resp.json()
+                    items = data.get("items", [])
+                except Exception as exc:
+                    log.warning("Naver '%s' start=%d error: %s", query, start, exc)
+                    break
+                if not items:
+                    break
+                log.info("Naver '%s' start=%d → %d items", query, start, len(items))
+                for item in items:
+                    name = re.sub(r"<[^>]+>", "", item.get("title", "")).strip()
+                    if not name:
+                        continue
+                    inst_id = re.sub(r"[^a-z0-9]+", "-", (name + "-" + city).lower()).strip("-")
+                    if inst_id in seen_ids:
+                        continue
+                    seen_ids.add(inst_id)
+                    desc = item.get("description", "") or ""
+                    addr = item.get("roadAddress") or item.get("address") or ""
+                    results.append({
+                        "instructor_id":       inst_id,
+                        "full_name":           name,
+                        "bio":                 desc or None,
+                        "certification_level": None,
+                        "yoga_alliance_id":    None,
+                        "lineage_school":      None,
+                        "lineage_depth":       0,
+                        "city":                city,
+                        "country":             "KR",
+                        "address":             addr or None,
+                        "telephone":           item.get("telephone") or None,
+                        "naver_link":          item.get("link") or None,
+                        "instagram_handle":    None,
+                        "instagram_followers": None,
+                        "specialties":         _infer_specialties_from_bio(desc),
+                        "avg_rating":          None,
+                        "review_count":        0,
+                        "data_source":         "naver_local",
+                        "scraped_at":          datetime.now(timezone.utc).isoformat(),
+                    })
+                total = int(data.get("total", 0))
+                if start + 5 > min(total, 100):
+                    break
+                start += 5
+                time.sleep(random.uniform(0.4, delay))
         time.sleep(random.uniform(0.2, 0.5))
 
     client.close()
@@ -419,7 +424,7 @@ def compute_trust_score(instructor: dict) -> float:
     # Reviews (0.0–0.3)
     avg = instructor.get("avg_rating")
     if avg is not None:
-        score += float(avg) / 5.0 * 0.3
+        score += min(float(avg), 5.0) / 5.0 * 0.3
 
     # Lineage depth (0.0–0.2, 5 levels max)
     depth = min(int(instructor.get("lineage_depth") or 0), 4)
@@ -551,7 +556,6 @@ def main() -> None:
     # Instagram enrichment
     handles = [h.strip() for h in args.handles.split(",") if h.strip()]
     if source in ("instagram", "all") and handles:
-        import os
         ig_pass = args.ig_pass or os.environ.get("IG_PASS")
         instructors = enrich_instagram(instructors, handles, args.ig_sleep,
                                        args.ig_user, ig_pass)

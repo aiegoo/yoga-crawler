@@ -30,6 +30,7 @@ import json
 import logging
 import os
 import random
+import re
 import subprocess
 import time
 from datetime import datetime, timezone
@@ -89,20 +90,25 @@ def scrape_yogaalliance_kr(pages: int = 10, delay: float = 2.0) -> list[dict]:
 
             for card in cards:
                 name_el = card.select_one("h2, h3, .name, .listing-name")
-                city_el = card.select_one(".city, .location, .address")
                 cert_el = card.select_one(".credential, .cert, .registration-type")
                 url_el  = card.select_one("a[href]")
+                name    = name_el.get_text(strip=True) if name_el else ""
+                if not name:
+                    continue
+                source_id = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:80]
+                cert_text = cert_el.get_text(strip=True) if cert_el else ""
 
                 results.append({
-                    "source":       "yogaalliance",
-                    "type":         "school",
-                    "name":         name_el.get_text(strip=True) if name_el else "",
-                    "location":     city_el.get_text(strip=True) if city_el else "",
-                    "cert_level":   cert_el.get_text(strip=True) if cert_el else "",
-                    "country":      "KR",
-                    "website":      url_el["href"] if url_el else "",
-                    "member_count": None,
-                    "crawled_at":   datetime.now(timezone.utc).isoformat(),
+                    "source":          "yogaalliance",
+                    "source_id":       f"ya-school-{source_id}",
+                    "name":            name,
+                    "name_en":         name,
+                    "org_type":        "school",
+                    "website":         url_el["href"] if url_el else "",
+                    "registration_id": None,
+                    "member_count":    None,
+                    "cert_levels":     [cert_text] if cert_text else [],
+                    "crawled_at":      datetime.now(timezone.utc).isoformat(),
                 })
 
             log.info("Page %d → %d schools (total so far: %d)", page, len(cards), len(results))
@@ -137,19 +143,23 @@ def scrape_yacep_kr(pages: int = 5, delay: float = 2.0) -> list[dict]:
 
             for card in cards:
                 name_el = card.select_one("h2, h3, .name")
-                city_el = card.select_one(".city, .location")
                 url_el  = card.select_one("a[href]")
+                name    = name_el.get_text(strip=True) if name_el else ""
+                if not name:
+                    continue
+                source_id = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:80]
 
                 results.append({
-                    "source":       "yogaalliance",
-                    "type":         "yacep",
-                    "name":         name_el.get_text(strip=True) if name_el else "",
-                    "location":     city_el.get_text(strip=True) if city_el else "",
-                    "cert_level":   "YACEP",
-                    "country":      "KR",
-                    "website":      url_el["href"] if url_el else "",
-                    "member_count": None,
-                    "crawled_at":   datetime.now(timezone.utc).isoformat(),
+                    "source":          "yogaalliance",
+                    "source_id":       f"ya-yacep-{source_id}",
+                    "name":            name,
+                    "name_en":         name,
+                    "org_type":        "yacep",
+                    "website":         url_el["href"] if url_el else "",
+                    "registration_id": None,
+                    "member_count":    None,
+                    "cert_levels":     ["YACEP"],
+                    "crawled_at":      datetime.now(timezone.utc).isoformat(),
                 })
 
             time.sleep(delay + random.uniform(0, 1.0))
@@ -186,18 +196,24 @@ def scrape_koreayoga(delay: float = 2.0) -> list[dict]:
             rows = soup.select("table tr, .member-list li, .org-list li")
             for row in rows:
                 text = row.get_text(separator=" ", strip=True)
-                if text:
-                    results.append({
-                        "source":       "koreayoga",
-                        "type":         "federation_member",
-                        "name":         text[:120],
-                        "location":     "Korea",
-                        "cert_level":   "",
-                        "country":      "KR",
-                        "website":      url,
-                        "member_count": None,
-                        "crawled_at":   datetime.now(timezone.utc).isoformat(),
-                    })
+                # Skip header/nav rows — require meaningful Korean text and reasonable length
+                if not (5 < len(text) < 200):
+                    continue
+                if not re.search(r"[가-힣]{3,}", text):
+                    continue
+                source_id = re.sub(r"[^a-z0-9가-힣]+", "-", text[:50].lower()).strip("-")
+                results.append({
+                    "source":          "koreayoga",
+                    "source_id":       f"kr-{source_id}",
+                    "name":            text[:120],
+                    "name_en":         None,
+                    "org_type":        "federation_member",
+                    "website":         url,
+                    "registration_id": None,
+                    "member_count":    None,
+                    "cert_levels":     [],
+                    "crawled_at":      datetime.now(timezone.utc).isoformat(),
+                })
 
             if results:
                 log.info("대한요가회: found %d entries at %s", len(results), url)
@@ -207,15 +223,16 @@ def scrape_koreayoga(delay: float = 2.0) -> list[dict]:
 
     # Always include the umbrella org itself
     results.insert(0, {
-        "source":       "koreayoga",
-        "type":         "national_federation",
-        "name":         "대한요가회",
-        "location":     "Seoul, Korea",
-        "cert_level":   "국가공인",
-        "country":      "KR",
-        "website":      "http://www.koreayoga.or.kr",
-        "member_count": None,
-        "crawled_at":   datetime.now(timezone.utc).isoformat(),
+        "source":          "koreayoga",
+        "source_id":       "daehan-yogahoe-live",
+        "name":            "대한요가회",
+        "name_en":         "Korea Yoga Federation",
+        "org_type":        "national_federation",
+        "website":         "http://www.koreayoga.or.kr",
+        "registration_id": None,
+        "member_count":    None,
+        "cert_levels":     ["국가공인"],
+        "crawled_at":      datetime.now(timezone.utc).isoformat(),
     })
 
     return results
@@ -225,46 +242,60 @@ def scrape_koreayoga(delay: float = 2.0) -> list[dict]:
 
 KNOWN_ASSOCIATIONS: list[dict] = [
     {
-        "source": "static", "type": "national_federation",
-        "name": "대한요가회", "location": "Seoul",
-        "cert_level": "국가공인", "country": "KR",
-        "website": "http://www.koreayoga.or.kr", "member_count": None,
+        "source": "static", "source_id": "daehan-yogahoe",
+        "name": "대한요가회", "name_en": "Korea Yoga Federation",
+        "org_type": "national_federation",
+        "website": "http://www.koreayoga.or.kr",
+        "registration_id": None, "member_count": None,
+        "cert_levels": ["국가공인"],
     },
     {
-        "source": "static", "type": "national_association",
-        "name": "한국요가협회", "location": "Seoul",
-        "cert_level": "민간", "country": "KR",
-        "website": "https://www.koreayogaassociation.com", "member_count": None,
+        "source": "static", "source_id": "hanguk-yoga-hyophoe",
+        "name": "한국요가협회", "name_en": "Korea Yoga Association",
+        "org_type": "national_association",
+        "website": "https://www.koreayogaassociation.com",
+        "registration_id": None, "member_count": None,
+        "cert_levels": ["민간"],
     },
     {
-        "source": "static", "type": "international_alliance",
-        "name": "Yoga Alliance (International)", "location": "USA",
-        "cert_level": "RYT-200/500/E-RYT", "country": "US",
-        "website": "https://www.yogaalliance.org", "member_count": None,
+        "source": "static", "source_id": "yogaalliance-intl",
+        "name": "Yoga Alliance (International)", "name_en": "Yoga Alliance",
+        "org_type": "international_alliance",
+        "website": "https://www.yogaalliance.org",
+        "registration_id": None, "member_count": None,
+        "cert_levels": ["RYT-200", "RYT-500", "E-RYT-200", "E-RYT-500"],
     },
     {
-        "source": "static", "type": "national_federation",
-        "name": "생활체육요가연합회", "location": "Seoul",
-        "cert_level": "생활체육", "country": "KR",
-        "website": "", "member_count": None,
+        "source": "static", "source_id": "saenghwal-yoga-yonhaphoe",
+        "name": "생활체육요가연합회", "name_en": None,
+        "org_type": "national_federation",
+        "website": "",
+        "registration_id": None, "member_count": None,
+        "cert_levels": ["생활체육"],
     },
     {
-        "source": "static", "type": "national_association",
-        "name": "한국아쉬탕가요가협회 (KAYA)", "location": "Seoul",
-        "cert_level": "아쉬탕가", "country": "KR",
-        "website": "", "member_count": None,
+        "source": "static", "source_id": "kaya",
+        "name": "한국아쉬탕가요가협회 (KAYA)", "name_en": "Korea Ashtanga Yoga Association",
+        "org_type": "national_association",
+        "website": "",
+        "registration_id": None, "member_count": None,
+        "cert_levels": ["아쉬탕가"],
     },
     {
-        "source": "static", "type": "international_alliance",
-        "name": "Iyengar Yoga Association of Korea", "location": "Seoul",
-        "cert_level": "Iyengar", "country": "KR",
-        "website": "", "member_count": None,
+        "source": "static", "source_id": "iyengar-yoga-kr",
+        "name": "Iyengar Yoga Association of Korea", "name_en": "Iyengar Yoga Association of Korea",
+        "org_type": "national_association",
+        "website": "",
+        "registration_id": None, "member_count": None,
+        "cert_levels": ["Iyengar"],
     },
     {
-        "source": "static", "type": "certification_body",
-        "name": "YACEP (Yoga Alliance Continuing Education Provider)", "location": "USA",
-        "cert_level": "YACEP", "country": "US",
-        "website": "https://www.yogaalliance.org/yacep", "member_count": None,
+        "source": "static", "source_id": "yacep-intl",
+        "name": "YACEP (Yoga Alliance Continuing Education Provider)", "name_en": "YACEP",
+        "org_type": "certification_body",
+        "website": "https://www.yogaalliance.org/yacep",
+        "registration_id": None, "member_count": None,
+        "cert_levels": ["YACEP"],
     },
 ]
 
@@ -277,35 +308,45 @@ def to_sql(associations: list[dict]) -> str:
             return "NULL"
         return "'" + str(v).replace("'", "''") + "'"
 
+    def esc_array(vals: list) -> str:
+        if not vals:
+            return "NULL"
+        escaped = [str(v).replace("'", "''") for v in vals]
+        return "ARRAY[" + ",".join(f"'{v}'" for v in escaped) + "]"
+
     lines = [
         "-- Auto-generated by scrape_associations.py",
         f"-- {datetime.now(timezone.utc).isoformat()}",
         "",
         "CREATE TABLE IF NOT EXISTS associations (",
-        "  id           SERIAL PRIMARY KEY,",
-        "  source       TEXT NOT NULL,",
-        "  type         TEXT,",
-        "  name         TEXT NOT NULL,",
-        "  location     TEXT,",
-        "  cert_level   TEXT,",
-        "  country      CHAR(2),",
-        "  website      TEXT,",
-        "  member_count INTEGER,",
-        "  crawled_at   TIMESTAMPTZ,",
-        "  UNIQUE (source, name)",
+        "  id              SERIAL PRIMARY KEY,",
+        "  source          TEXT NOT NULL,",
+        "  source_id       TEXT,",
+        "  name            TEXT NOT NULL,",
+        "  name_en         TEXT,",
+        "  org_type        TEXT,",
+        "  website         TEXT,",
+        "  registration_id TEXT,",
+        "  member_count    INTEGER,",
+        "  cert_levels     TEXT[],",
+        "  crawled_at      TIMESTAMPTZ,",
+        "  UNIQUE (source, source_id)",
         ");",
         "",
     ]
     for a in associations:
         ts = a.get("crawled_at") or datetime.now(timezone.utc).isoformat()
         lines.append(
-            f"INSERT INTO associations (source,type,name,location,cert_level,country,"
-            f"website,member_count,crawled_at) VALUES ("
-            f"{esc(a.get('source'))},{esc(a.get('type'))},{esc(a.get('name'))},"
-            f"{esc(a.get('location'))},{esc(a.get('cert_level'))},{esc(a.get('country'))},"
-            f"{esc(a.get('website'))},{esc(a.get('member_count'))},{esc(ts)}"
-            f") ON CONFLICT (source,name) DO UPDATE SET "
-            f"website=EXCLUDED.website, crawled_at=EXCLUDED.crawled_at;"
+            f"INSERT INTO associations (source,source_id,name,name_en,org_type,"
+            f"website,registration_id,member_count,cert_levels,crawled_at) VALUES ("
+            f"{esc(a.get('source'))},{esc(a.get('source_id'))},{esc(a.get('name'))},"
+            f"{esc(a.get('name_en'))},{esc(a.get('org_type'))},"
+            f"{esc(a.get('website'))},{esc(a.get('registration_id'))},"
+            f"{esc(a.get('member_count'))},{esc_array(a.get('cert_levels') or [])},"
+            f"{esc(ts)}"
+            f") ON CONFLICT (source,source_id) DO UPDATE SET "
+            f"name=EXCLUDED.name, website=EXCLUDED.website, "
+            f"cert_levels=EXCLUDED.cert_levels, crawled_at=EXCLUDED.crawled_at;"
         )
     return "\n".join(lines)
 
@@ -339,12 +380,17 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--delay", type=float, default=2.0)
     p.add_argument("--s3-sync", action="store_true")
     p.add_argument("--dry-run", action="store_true", help="No-op: accepted for pipeline compatibility")
+    p.add_argument("--out-dir", type=Path, default=OUT_DIR,
+                   help="Output directory for JSON and SQL files")
     return p.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out_dir  = args.out_dir
+    out_json = out_dir / "associations_raw.json"
+    out_sql  = out_dir / "associations_seed.sql"
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     results: list[dict] = []
 
@@ -372,14 +418,14 @@ def main() -> None:
 
     log.info("Total associations (deduped): %d", len(deduped))
 
-    OUT_JSON.write_text(json.dumps(deduped, ensure_ascii=False, indent=2), encoding="utf-8")
-    log.info("Wrote %s", OUT_JSON)
+    out_json.write_text(json.dumps(deduped, ensure_ascii=False, indent=2), encoding="utf-8")
+    log.info("Wrote %s", out_json)
 
-    OUT_SQL.write_text(to_sql(deduped), encoding="utf-8")
-    log.info("Wrote %s", OUT_SQL)
+    out_sql.write_text(to_sql(deduped), encoding="utf-8")
+    log.info("Wrote %s", out_sql)
 
     if args.s3_sync:
-        s3_sync(OUT_DIR, S3_BUCKET)
+        s3_sync(out_dir, S3_BUCKET)
 
     log.info("Done — %d associations saved", len(deduped))
 

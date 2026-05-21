@@ -174,11 +174,9 @@ def kakao_search(query: str, delay: float = 1.0, dry_run: bool = False) -> list[
                 log.info("[DRY-RUN] Kakao query=%r page=%d", query, page)
                 break
 
-            try:
-                resp = client.get(KAKAO_URL, params=params, headers=headers)
-                resp.raise_for_status()
-            except httpx.HTTPError as exc:
-                log.warning("Kakao HTTP error page=%d: %s", page, exc)
+            resp = _http_get(client, KAKAO_URL, params=params, headers=headers)
+            if resp is None:
+                log.warning("Kakao request failed on page=%d — stopping", page)
                 break
 
             data = resp.json()
@@ -244,11 +242,9 @@ def naver_search(query: str, delay: float = 1.0, dry_run: bool = False) -> list[
                 log.info("[DRY-RUN] Naver query=%r start=%d", query, start)
                 break
 
-            try:
-                resp = client.get(NAVER_URL, params=params, headers=headers)
-                resp.raise_for_status()
-            except httpx.HTTPError as exc:
-                log.warning("Naver HTTP error start=%d: %s", start, exc)
+            resp = _http_get(client, NAVER_URL, params=params, headers=headers)
+            if resp is None:
+                log.warning("Naver request failed at start=%d — stopping", start)
                 break
 
             data = resp.json()
@@ -294,13 +290,42 @@ def _naver_to_wgs84(mapx: str, mapy: str) -> tuple[str, str]:
     """
     Naver map coordinates are integers scaled by 1e7 from WGS84 degrees.
     e.g. mapx=1269677285 → lng=126.9677285
+    Fixed-precision format ensures consistent dedup key strings.
     """
     try:
-        x = str(int(mapx) / 1e7)
-        y = str(int(mapy) / 1e7)
+        x = f"{int(mapx) / 1e7:.7f}"
+        y = f"{int(mapy) / 1e7:.7f}"
         return x, y
     except (ValueError, TypeError):
         return mapx, mapy
+
+
+# ── HTTP retry ────────────────────────────────────────────────────────────────
+
+def _http_get(client: httpx.Client, url: str, *, params=None, headers=None,
+              max_retries: int = 3) -> "httpx.Response | None":
+    """GET with exponential backoff on transient errors."""
+    for attempt in range(max_retries):
+        try:
+            resp = client.get(url, params=params, headers=headers)
+            resp.raise_for_status()
+            return resp
+        except httpx.HTTPStatusError as exc:
+            status = exc.response.status_code
+            if status == 429 or status >= 500:
+                wait = 2 ** (attempt + 1)
+                log.warning("HTTP %d attempt %d/%d — retrying in %ds",
+                            status, attempt + 1, max_retries, wait)
+                time.sleep(wait)
+            else:
+                log.warning("HTTP %d — not retrying", status)
+                return None
+        except httpx.HTTPError as exc:
+            wait = 2 ** attempt
+            log.warning("HTTP error attempt %d/%d: %s — retrying in %ds",
+                        attempt + 1, max_retries, exc, wait)
+            time.sleep(wait)
+    return None
 
 
 # ── SQL generator ─────────────────────────────────────────────────────────────
