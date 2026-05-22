@@ -1131,19 +1131,6 @@
     "crawled_at": "2026-05-20T05:58:14.498175+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1268997090_375356996",
-    "name": "아마비아요가 당산점",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "서울특별시 영등포구 당산동6가 341-1 소미더클래스한강 101동 지하1층",
-    "road_address": "서울특별시 영등포구 선유로54길 14 소미더클래스한강 101동 지하1층",
-    "x": "126.899709",
-    "y": "37.5356996",
-    "place_url": "https://www.instagram.com/amavia__ds/",
-    "crawled_at": "2026-05-20T05:58:14.498220+00:00"
-  },
-  {
     "source": "kakao",
     "source_id": "1735033453",
     "name": "룩스필라테스&요가 공릉역점",
@@ -2380,19 +2367,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1270660575_375630587",
-    "name": "공감요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "서울특별시 동대문구 장안동 433-5 4층 공감요가",
-    "road_address": "서울특별시 동대문구 장한로 20 4층 공감요가",
-    "x": "127.0660575",
-    "y": "37.5630587",
-    "place_url": "https://booking.naver.com/booking/6/bizes/956127",
-    "crawled_at": "2026-05-20T05:58:26.224149+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1270161059_375727249",
     "name": "바른요가필라테스",
     "category": "스포츠시설>필라테스",
@@ -2484,19 +2458,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1269829747_374860933",
-    "name": "라인요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "서울특별시 서초구 방배동 3001-2 503호 라인요가",
-    "road_address": "서울특별시 서초구 서초대로 3-4 503호 라인요가",
-    "x": "126.9829747",
-    "y": "37.4860933",
-    "place_url": "https://blog.naver.com/merry9797",
-    "crawled_at": "2026-05-20T05:58:26.364291+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1269592218_374885013",
     "name": "라라요가",
     "category": "스포츠시설>요가원",
@@ -2507,19 +2468,6 @@
     "y": "37.4885013",
     "place_url": "https://blog.naver.com/lalayoga",
     "crawled_at": "2026-05-20T05:58:26.364297+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271108010_375085176",
-    "name": "우리 요가아누",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "서울특별시 송파구 송파동 47-5 동화빌딩 401호",
-    "road_address": "서울특별시 송파구 백제고분로 421 동화빌딩 401호",
-    "x": "127.110801",
-    "y": "37.5085176",
-    "place_url": "https://blog.naver.com/wooriyoga",
-    "crawled_at": "2026-05-20T05:58:26.364305+00:00"
   },
   {
     "source": "naver",
@@ -2741,19 +2689,6 @@
     "y": "35.1648981",
     "place_url": "https://www.instagram.com/hayoga_official",
     "crawled_at": "2026-05-20T05:58:26.752808+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1290650670_351448522",
-    "name": "고스또소 부산",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "부산광역시 남구 문현동 734-3 4층 1호",
-    "road_address": "부산광역시 남구 전포대로91번길 27 4층 1호",
-    "x": "129.065067",
-    "y": "35.1448522",
-    "place_url": "https://www.instagram.com/gostosobusan/",
-    "crawled_at": "2026-05-20T05:58:26.752814+00:00"
   },
   {
     "source": "naver",
@@ -4018,19 +3953,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1290739435_351768073",
-    "name": "요가판타지아",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "부산광역시 부산진구 양정동 215-2 7층",
-    "road_address": "부산광역시 부산진구 중앙대로 979 7층",
-    "x": "129.0739435",
-    "y": "35.1768073",
-    "place_url": "https://blog.naver.com/yogafantasia_",
-    "crawled_at": "2026-05-20T05:58:37.794871+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1290890192_351503273",
     "name": "타다요가",
     "category": "스포츠시설>요가원",
@@ -4171,19 +4093,6 @@
     "y": "35.1738144",
     "place_url": "https://blog.naver.com/meeso1102",
     "crawled_at": "2026-05-20T05:58:38.061669+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1290764187_352103381",
-    "name": "카이젠요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "부산광역시 동래구 온천동 750-65 효전캐슬 101호",
-    "road_address": "부산광역시 동래구 중앙대로1367번길 32-13 효전캐슬 101호",
-    "x": "129.0764187",
-    "y": "35.2103381",
-    "place_url": "https://blog.naver.com/kaizenyoga_dongrae",
-    "crawled_at": "2026-05-20T05:58:38.061716+00:00"
   },
   {
     "source": "naver",
@@ -5720,19 +5629,6 @@
     "crawled_at": "2026-05-20T05:58:50.446701+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1267196089_374552349",
-    "name": "로카요가스튜디오",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "인천광역시 남동구 구월동 1264 퍼스트하임프라자 224호",
-    "road_address": "인천광역시 남동구 호구포로 818 퍼스트하임프라자 224호",
-    "x": "126.7196089",
-    "y": "37.4552349",
-    "place_url": "https://blog.naver.com/lokahstudio",
-    "crawled_at": "2026-05-20T05:58:50.446707+00:00"
-  },
-  {
     "source": "kakao",
     "source_id": "2048761783",
     "name": "인천하타요가",
@@ -6331,19 +6227,6 @@
     "crawled_at": "2026-05-20T05:58:53.960948+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1266528441_375340576",
-    "name": "엔젤요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "인천광역시 서구 청라동 162-10 진영메디피아 605호 엔젤요가",
-    "road_address": "인천광역시 서구 청라라임로 71 진영메디피아 605호 엔젤요가",
-    "x": "126.6528441",
-    "y": "37.5340576",
-    "place_url": "https://blog.naver.com/angeng81",
-    "crawled_at": "2026-05-20T05:58:54.043424+00:00"
-  },
-  {
     "source": "kakao",
     "source_id": "1658236582",
     "name": "밸런스요가 앤 필라테스 인천구월점",
@@ -6368,19 +6251,6 @@
     "y": "37.4614350264876",
     "place_url": "http://place.map.kakao.com/17868168",
     "crawled_at": "2026-05-20T05:58:59.650535+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1266501721_373949168",
-    "name": "락쉬미핫요가 본원",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "인천광역시 연수구 송도동 3-2 드림씨티 5층 522호",
-    "road_address": "인천광역시 연수구 컨벤시아대로 81 드림씨티 5층 522호",
-    "x": "126.6501721",
-    "y": "37.3949168",
-    "place_url": "https://blog.naver.com/lakshmiyoga",
-    "crawled_at": "2026-05-20T05:58:54.043460+00:00"
   },
   {
     "source": "kakao",
@@ -6722,19 +6592,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1266471371_373949934",
-    "name": "타입 필라테스 요가 송도 본점",
-    "category": "스포츠시설>필라테스",
-    "phone": "",
-    "address": "인천광역시 연수구 송도동 21-57 대홍프라자 7층 701,702호",
-    "road_address": "인천광역시 연수구 해돋이로152번길 9 대홍프라자 7층 701,702호",
-    "x": "126.6471371",
-    "y": "37.3949934",
-    "place_url": "https://blog.naver.com/type_pilates_01",
-    "crawled_at": "2026-05-20T05:59:01.474491+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1266673172_375980110",
     "name": "휘트니스칸 마전점 헬스&amp;PT&amp;골프&amp;요가&amp;필라테스",
     "category": "스포츠시설>헬스장",
@@ -6823,32 +6680,6 @@
     "y": "37.4427083",
     "place_url": "https://pf.kakao.com/_txcmUb",
     "crawled_at": "2026-05-20T05:59:01.632659+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1266340778_373889752",
-    "name": "요가람 송도",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "인천광역시 연수구 송도동 98-1 닥터플러스몰 A202호",
-    "road_address": "인천광역시 연수구 컨벤시아대로230번길 54 닥터플러스몰 A202호",
-    "x": "126.6340778",
-    "y": "37.3889752",
-    "place_url": "https://blog.naver.com/yogaram-songdo",
-    "crawled_at": "2026-05-20T05:59:01.632689+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1267339104_375281198",
-    "name": "요가클랜",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "인천광역시 계양구 작전동 134-3 3층 요가클랜",
-    "road_address": "인천광역시 계양구 효서로 339 3층 요가클랜",
-    "x": "126.7339104",
-    "y": "37.5281198",
-    "place_url": "http://pf.kakao.com/_lexgvb",
-    "crawled_at": "2026-05-20T05:59:01.632718+00:00"
   },
   {
     "source": "kakao",
@@ -6969,19 +6800,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1266643933_373869564",
-    "name": "인천아쉬탕가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "인천광역시 연수구 송도동 149 301동 3층 비-313호",
-    "road_address": "인천광역시 연수구 송도과학로27번길 55 301동 3층 비-313호",
-    "x": "126.6643933",
-    "y": "37.3869564",
-    "place_url": "https://www.instagram.com/incheonashtanga",
-    "crawled_at": "2026-05-20T05:59:01.986821+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1264870230_377459803",
     "name": "섬, 요가",
     "category": "스포츠,레크레이션교육>요가,명상",
@@ -7070,19 +6888,6 @@
     "y": "35.1514591266901",
     "place_url": "http://place.map.kakao.com/843432830",
     "crawled_at": "2026-05-20T05:59:02.333992+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1268956276_351713858",
-    "name": "원하다 필라테스요가스튜디오",
-    "category": "스포츠시설>필라테스",
-    "phone": "",
-    "address": "광주광역시 북구 신안동 818 상가동 2층 201호",
-    "road_address": "광주광역시 북구 서암대로 95 상가동 2층 201호",
-    "x": "126.8956276",
-    "y": "35.1713858",
-    "place_url": "https://www.instagram.com/onehada_23",
-    "crawled_at": "2026-05-20T05:59:02.416975+00:00"
   },
   {
     "source": "naver",
@@ -8412,19 +8217,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1268146948_352005239",
-    "name": "캘리포니아 파워요가",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "광주광역시 광산구 장덕동 1043 수완지구 호반 베르디움 2차 상가동 202호",
-    "road_address": "광주광역시 광산구 풍영로329번길 19 수완지구 호반 베르디움 2차 상가동 202호",
-    "x": "126.8146948",
-    "y": "35.2005239",
-    "place_url": "https://www.instagram.com/california_poweryoga",
-    "crawled_at": "2026-05-20T05:59:13.279945+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1269008220_351318161",
     "name": "혜와 요가",
     "category": "스포츠시설>요가원",
@@ -9595,19 +9387,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1293225151_355634555",
-    "name": "가르바요가스튜디오",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "울산광역시 중구 복산동 703 206,207,208호",
-    "road_address": "울산광역시 중구 종가로 406-21 206,207,208호",
-    "x": "129.3225151",
-    "y": "35.5634555",
-    "place_url": "https://blog.naver.com/garbhayoga",
-    "crawled_at": "2026-05-20T05:59:24.818558+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1294375205_356334769",
     "name": "래빗스튜디오",
     "category": "스포츠시설>필라테스",
@@ -10388,19 +10167,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1292647519_355546649",
-    "name": "더요가필라테스 울산교육관",
-    "category": "스포츠시설>필라테스",
-    "phone": "",
-    "address": "울산광역시 남구 무거동 272-12 한솔애플타워 902호",
-    "road_address": "울산광역시 남구 울밀로 2906 한솔애플타워 902호",
-    "x": "129.2647519",
-    "y": "35.5546649",
-    "place_url": "https://www.instagram.com/the_yogapilates_ulsan_2015",
-    "crawled_at": "2026-05-20T05:59:32.195978+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1293365556_355413933",
     "name": "아름다운요가2호점",
     "category": "스포츠,레크레이션교육>요가,명상",
@@ -10439,19 +10205,6 @@
     "crawled_at": "2026-05-20T05:59:32.321093+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1293453122_355558865",
-    "name": "오르다요가",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "울산광역시 중구 반구동 648 3층",
-    "road_address": "울산광역시 중구 반구정10길 53 3층",
-    "x": "129.3453122",
-    "y": "35.5558865",
-    "place_url": "https://www.instagram.com/orda_yoga",
-    "crawled_at": "2026-05-20T05:59:32.321098+00:00"
-  },
-  {
     "source": "kakao",
     "source_id": "20611848",
     "name": "아이엠핫요가",
@@ -10463,19 +10216,6 @@
     "y": "35.5741083757615",
     "place_url": "http://place.map.kakao.com/20611848",
     "crawled_at": "2026-05-20T05:59:32.376324+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1292412684_355741506",
-    "name": "아이엠핫요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "울산광역시 울주군 범서읍 구영리 851-4",
-    "road_address": "울산광역시 울주군 범서읍 구영로 94",
-    "x": "129.2412684",
-    "y": "35.5741506",
-    "place_url": "http://0522486262.ussoft.kr/",
-    "crawled_at": "2026-05-20T05:59:32.471206+00:00"
   },
   {
     "source": "naver",
@@ -10505,19 +10245,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1293915030_355347462",
-    "name": "요가비욘드",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "울산광역시 북구 염포동 175-1 1층",
-    "road_address": "울산광역시 북구 새장터6길 9-6 1층",
-    "x": "129.391503",
-    "y": "35.5347462",
-    "place_url": "https://www.instagram.com/yogabeyond.official",
-    "crawled_at": "2026-05-20T05:59:32.607155+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1293064031_355368123",
     "name": "아난디 요가",
     "category": "협회,단체>요가",
@@ -10541,19 +10268,6 @@
     "y": "35.5271378",
     "place_url": "http://스타나요가.com",
     "crawled_at": "2026-05-20T05:59:32.607170+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1294411269_356275921",
-    "name": "요가 나마스카르",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "울산광역시 북구 산하동 1020-16 3층",
-    "road_address": "울산광역시 북구 동해안로 1603 3층",
-    "x": "129.4411269",
-    "y": "35.6275921",
-    "place_url": "",
-    "crawled_at": "2026-05-20T05:59:32.854893+00:00"
   },
   {
     "source": "naver",
@@ -11636,19 +11350,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1270759280_372479857",
-    "name": "경희요가필라테스교육센터 영통점",
-    "category": "스포츠시설>필라테스",
-    "phone": "",
-    "address": "경기도 수원시 영통구 영통동 1024-1 예주프라자 2층 경희요가필라테스",
-    "road_address": "경기도 수원시 영통구 덕영대로 1689 예주프라자 2층 경희요가필라테스",
-    "x": "127.075928",
-    "y": "37.2479857",
-    "place_url": "http://www.instagram.com/kyunghee_univ.yogapilates",
-    "crawled_at": "2026-05-20T05:59:42.374393+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1270816763_372662965",
     "name": "뉴핏필라테스영통점",
     "category": "스포츠시설>필라테스",
@@ -11737,19 +11438,6 @@
     "y": "37.2604682",
     "place_url": "https://www.instagram.com/salinyoga1",
     "crawled_at": "2026-05-20T05:59:42.509847+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1269823273_372971720",
-    "name": "프롬요가",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "경기도 수원시 장안구 천천동 524-3 로얄프라자 6층 프롬요가",
-    "road_address": "경기도 수원시 장안구 덕영대로535번길 38 로얄프라자 6층 프롬요가",
-    "x": "126.9823273",
-    "y": "37.297172",
-    "place_url": "https://www.instagram.com/_fromyoga",
-    "crawled_at": "2026-05-20T05:59:42.509852+00:00"
   },
   {
     "source": "kakao",
@@ -11857,19 +11545,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1270310236_372930769",
-    "name": "JRY핫요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 수원시 장안구 연무동 245-49 송원빌딩 4층",
-    "road_address": "경기도 수원시 장안구 창훈로8번길 2 송원빌딩 4층",
-    "x": "127.0310236",
-    "y": "37.2930769",
-    "place_url": "",
-    "crawled_at": "2026-05-20T05:59:42.651797+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1270471593_373039666",
     "name": "요가해보리 광교점",
     "category": "스포츠시설>요가원",
@@ -11893,19 +11568,6 @@
     "y": "37.2797859",
     "place_url": "https://blog.naver.com/dungjaeng2blog",
     "crawled_at": "2026-05-20T05:59:42.809565+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1270744554_372520344",
-    "name": "테마요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 수원시 영통구 영통동 998-6 808",
-    "road_address": "경기도 수원시 영통구 청명남로 21 808",
-    "x": "127.0744554",
-    "y": "37.2520344",
-    "place_url": "http://cafe.daum.net/themayoga",
-    "crawled_at": "2026-05-20T05:59:42.809571+00:00"
   },
   {
     "source": "naver",
@@ -12312,19 +11974,6 @@
   },
   {
     "source": "kakao",
-    "source_id": "8938731",
-    "name": "라자요가원",
-    "category": "스포츠,레저 > 요가,필라테스 > 요가원",
-    "phone": "",
-    "address": "경남 창원시 마산회원구 내서읍 호계리 790-124",
-    "road_address": "경남 창원시 마산회원구 내서읍 호계본동로 17-2",
-    "x": "128.521039752278",
-    "y": "35.2615064356532",
-    "place_url": "http://place.map.kakao.com/8938731",
-    "crawled_at": "2026-05-20T05:59:45.219684+00:00"
-  },
-  {
-    "source": "kakao",
     "source_id": "18951491",
     "name": "제이핫요가",
     "category": "스포츠,레저 > 요가,필라테스 > 요가원",
@@ -12374,19 +12023,6 @@
     "y": "35.1899892",
     "place_url": "https://www.instagram.com/hyeonjuyoga",
     "crawled_at": "2026-05-20T05:59:46.964432+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1286786820_352259290",
-    "name": "뉴욕플라잉요가필라테스",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경상남도 창원시 성산구 중앙동 85-6 4층",
-    "road_address": "경상남도 창원시 성산구 용지로 115 4층",
-    "x": "128.678682",
-    "y": "35.225929",
-    "place_url": "https://www.instagram.com/newyorkflyingyoga_pilates",
-    "crawled_at": "2026-05-20T05:59:46.964443+00:00"
   },
   {
     "source": "kakao",
@@ -12702,19 +12338,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1288101896_351016512",
-    "name": "한채원요가필라테스",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경상남도 창원시 진해구 용원동 1211-2",
-    "road_address": "경상남도 창원시 진해구 안골로 344",
-    "x": "128.8101896",
-    "y": "35.1016512",
-    "place_url": "http://blog.naver.com/tarahcw",
-    "crawled_at": "2026-05-20T05:59:50.926759+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1285763403_352287697",
     "name": "웨일요가",
     "category": "스포츠시설>요가원",
@@ -12738,19 +12361,6 @@
     "y": "35.2274717",
     "place_url": "http://cafe.naver.com/hotyogadance/?viewType=pc",
     "crawled_at": "2026-05-20T05:59:51.056576+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1287114494_352038962",
-    "name": "브리드요가원",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "경상남도 창원시 성산구 성주동 100 더 스퀘어 제6층 602호",
-    "road_address": "경상남도 창원시 성산구 대암로 247 더 스퀘어 제6층 602호",
-    "x": "128.7114494",
-    "y": "35.2038962",
-    "place_url": "https://www.instagram.com/breathe_yoga.studio?igsh=cHB6ZHNkYjFueXo3&utm_source=qr",
-    "crawled_at": "2026-05-20T05:59:51.190110+00:00"
   },
   {
     "source": "naver",
@@ -13661,19 +13271,6 @@
     "y": "37.3787094311703",
     "place_url": "http://place.map.kakao.com/572235700",
     "crawled_at": "2026-05-20T05:59:59.509332+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271429497_374722451",
-    "name": "위례 아쉬탕가요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 성남시 수정구 창곡동 509-2 309호 위례 요가 위례 아쉬탕가요가",
-    "road_address": "경기도 성남시 수정구 위례광장로 320 309호 위례 요가 위례 아쉬탕가요가",
-    "x": "127.1429497",
-    "y": "37.4722451",
-    "place_url": "https://blog.naver.com/fromyoga",
-    "crawled_at": "2026-05-20T05:59:59.596067+00:00"
   },
   {
     "source": "naver",
@@ -14677,19 +14274,6 @@
     "crawled_at": "2026-05-20T06:00:08.532761+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1268358968_376237134",
-    "name": "화우요가",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "경기도 고양시 덕양구 행신동 950",
-    "road_address": "경기도 고양시 덕양구 중앙로 554",
-    "x": "126.8358968",
-    "y": "37.6237134",
-    "place_url": "https://blog.naver.com/hwawoo_yoga?tab=1",
-    "crawled_at": "2026-05-20T06:00:08.532766+00:00"
-  },
-  {
     "source": "kakao",
     "source_id": "391505403",
     "name": "인디야핫요가",
@@ -15315,19 +14899,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1271126918_373068529",
-    "name": "라티로터스라운지",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "경기도 용인시 기흥구 보정동 1328-8 1층 라티로터스라운지",
-    "road_address": "경기도 용인시 기흥구 신촌로73번길 1 (보정동) 1층 라티로터스라운지",
-    "x": "127.1126918",
-    "y": "37.3068529",
-    "place_url": "https://smartstore.naver.com/eslatti",
-    "crawled_at": "2026-05-20T06:00:17.159789+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1271118230_372441159",
     "name": "파네시마 복합문화공간",
     "category": "직업,기술교육>제과,제빵",
@@ -15416,45 +14987,6 @@
     "y": "37.3319471",
     "place_url": "https://blog.naver.com/wpilates26",
     "crawled_at": "2026-05-20T06:00:17.306603+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1270747062_372405341",
-    "name": "서천요가원",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 용인시 기흥구 서천동 731-1 101호",
-    "road_address": "경기도 용인시 기흥구 서천서로12번길 4-19 101호",
-    "x": "127.0747062",
-    "y": "37.2405341",
-    "place_url": "https://www.instagram.com/seocheon_yoga",
-    "crawled_at": "2026-05-20T06:00:17.443967+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271072867_373003072",
-    "name": "요가그림",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 용인시 기흥구 마북동 524-13 벽산주상가 304호",
-    "road_address": "경기도 용인시 기흥구 용구대로 2398 벽산주상가 304호",
-    "x": "127.1072867",
-    "y": "37.3003072",
-    "place_url": "http://instagram.com/yogageulim",
-    "crawled_at": "2026-05-20T06:00:17.443992+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1270986127_373403812",
-    "name": "나마스떼 하우스",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "경기도 용인시 수지구 동천동 371-5 2층 202호",
-    "road_address": "경기도 용인시 수지구 동천로 39 2층 202호",
-    "x": "127.0986127",
-    "y": "37.3403812",
-    "place_url": "https://www.instagram.com/namastehaus/",
-    "crawled_at": "2026-05-20T06:00:17.444002+00:00"
   },
   {
     "source": "kakao",
@@ -15559,19 +15091,6 @@
     "y": "37.4440394256423",
     "place_url": "http://place.map.kakao.com/1833931028",
     "crawled_at": "2026-05-20T06:00:18.060390+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1268127558_374626597",
-    "name": "지금요가스튜디오",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 부천시 소사구 옥길동 777-1",
-    "road_address": "경기도 부천시 소사구 범안로 221",
-    "x": "126.8127558",
-    "y": "37.4626597",
-    "place_url": "http://instagram.com/jigum_yoga_studio",
-    "crawled_at": "2026-05-20T06:00:18.135051+00:00"
   },
   {
     "source": "naver",
@@ -16235,19 +15754,6 @@
     "y": "37.4912667",
     "place_url": "https://youtube.com/요피싸롱",
     "crawled_at": "2026-05-20T06:00:27.906048+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1267784067_374989431",
-    "name": "푸루샤요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 부천시 원미구 중동 1111 상가6동 2층 214호",
-    "road_address": "경기도 부천시 원미구 신흥로 170-1 상가6동 2층 214호",
-    "x": "126.7784067",
-    "y": "37.4989431",
-    "place_url": "https://www.instagram.com/purusha_yoga1",
-    "crawled_at": "2026-05-20T06:00:28.045947+00:00"
   },
   {
     "source": "kakao",
@@ -17031,19 +16537,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1274302767_367122070",
-    "name": "마리요가",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "충청북도 청주시 청원구 오창읍 양청리 818-5 402",
-    "road_address": "충청북도 청주시 청원구 오창읍 중심상업로 14 402",
-    "x": "127.4302767",
-    "y": "36.712207",
-    "place_url": "https://blog.naver.com/marieyoga",
-    "crawled_at": "2026-05-20T06:00:36.592601+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1274406444_366061314",
     "name": "요가 림",
     "category": "스포츠시설>요가원",
@@ -17067,19 +16560,6 @@
     "y": "36.6642392",
     "place_url": "https://open.kakao.com/o/srI7dlji",
     "crawled_at": "2026-05-20T06:00:36.592612+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1274290813_367138974",
-    "name": "수 요가필라테스",
-    "category": "스포츠시설>필라테스",
-    "phone": "",
-    "address": "충청북도 청주시 청원구 오창읍 양청리 792-5 5층 503호",
-    "road_address": "충청북도 청주시 청원구 오창읍 중심상업로 31-4 5층 503호",
-    "x": "127.4290813",
-    "y": "36.7138974",
-    "place_url": "https://blog.naver.com/su_yogapilates",
-    "crawled_at": "2026-05-20T06:00:36.714665+00:00"
   },
   {
     "source": "naver",
@@ -17550,17 +17030,17 @@
     "crawled_at": "2026-05-20T06:00:38.975523+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1268372520_373122934",
-    "name": "푸루샤요가 안산중앙점",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 안산시 단원구 고잔동 741-3 2층",
-    "road_address": "경기도 안산시 단원구 광덕3로 219 2층",
-    "x": "126.837252",
-    "y": "37.3122934",
-    "place_url": "https://pf.kakao.com/_Luxlexj",
-    "crawled_at": "2026-05-20T06:00:38.975536+00:00"
+    "source": "kakao",
+    "source_id": "529495681",
+    "name": "안산하타요가",
+    "category": "스포츠,레저 > 요가,필라테스 > 요가원",
+    "phone": "010-9766-4288",
+    "address": "경기 안산시 단원구 고잔동 741-3",
+    "road_address": "경기 안산시 단원구 광덕3로 219",
+    "x": "126.83725217825615",
+    "y": "37.31229361701654",
+    "place_url": "http://place.map.kakao.com/529495681",
+    "crawled_at": "2026-05-22T13:01:48.244612+00:00"
   },
   {
     "source": "naver",
@@ -17834,32 +17314,6 @@
     "y": "35.8607513892616",
     "place_url": "http://place.map.kakao.com/6778700",
     "crawled_at": "2026-05-20T06:00:41.861200+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271504976_358607439",
-    "name": "숨 쉬다요가스튜디오",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "전북특별자치도 전주시 덕진구 호성동1가 587-35 3층",
-    "road_address": "전북특별자치도 전주시 덕진구 호성3길 20 3층",
-    "x": "127.1504976",
-    "y": "35.8607439",
-    "place_url": "https://blog.naver.com/cholongie82",
-    "crawled_at": "2026-05-20T06:00:41.946526+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1270618481_358393673",
-    "name": "진희요가스튜디오",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "전북특별자치도 전주시 덕진구 장동 1087-1 대흥빌딩 5층 진희요가스튜디오",
-    "road_address": "전북특별자치도 전주시 덕진구 출판로 84 대흥빌딩 5층 진희요가스튜디오",
-    "x": "127.0618481",
-    "y": "35.8393673",
-    "place_url": "https://www.instagram.com/jinhee_yoga_studio_/",
-    "crawled_at": "2026-05-20T06:00:41.946539+00:00"
   },
   {
     "source": "kakao",
@@ -18318,19 +17772,6 @@
   },
   {
     "source": "kakao",
-    "source_id": "12784049",
-    "name": "아트마요가아쉬람",
-    "category": "스포츠,레저 > 요가,필라테스 > 요가원",
-    "phone": "063-244-8973",
-    "address": "전북특별자치도 전주시 덕진구 인후동1가 818-6",
-    "road_address": "전북특별자치도 전주시 덕진구 건산로 194",
-    "x": "127.158573681733",
-    "y": "35.833429326522",
-    "place_url": "http://place.map.kakao.com/12784049",
-    "crawled_at": "2026-05-20T06:00:45.448225+00:00"
-  },
-  {
-    "source": "kakao",
     "source_id": "725809262",
     "name": "네츄럴큐어요가",
     "category": "스포츠,레저 > 요가,필라테스 > 요가원",
@@ -18668,19 +18109,6 @@
     "crawled_at": "2026-05-20T06:00:49.844930+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1270819076_358479160",
-    "name": "고요가하우스",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "전북특별자치도 전주시 덕진구 만성동 1349-6 베스트에버빌딩 402호",
-    "road_address": "전북특별자치도 전주시 덕진구 만성북로 63 베스트에버빌딩 402호",
-    "x": "127.0819076",
-    "y": "35.847916",
-    "place_url": "https://blog.naver.com/rjawl729",
-    "crawled_at": "2026-05-20T06:00:49.992095+00:00"
-  },
-  {
     "source": "kakao",
     "source_id": "1122582255",
     "name": "아델요가스튜디오",
@@ -18760,19 +18188,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1269553017_373911299",
-    "name": "니나요가 플라잉스튜디오",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 안양시 동안구 호계동 1047-8 403,404호",
-    "road_address": "경기도 안양시 동안구 평촌대로 221 403,404호",
-    "x": "126.9553017",
-    "y": "37.3911299",
-    "place_url": "https://blog.naver.com/ninayogastudio",
-    "crawled_at": "2026-05-20T06:00:50.369849+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1269604027_373637488",
     "name": "트릴로지 스튜디오",
     "category": "스포츠시설>필라테스",
@@ -18783,19 +18198,6 @@
     "y": "37.3637488",
     "place_url": "https://blog.naver.com/trilogystudio",
     "crawled_at": "2026-05-20T06:00:50.369856+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1269608296_373831494",
-    "name": "기리요가 스튜디오",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 안양시 동안구 평촌동 922-4 민백빌딩 B02호",
-    "road_address": "경기도 안양시 동안구 평촌대로 118 민백빌딩 B02호",
-    "x": "126.9608296",
-    "y": "37.3831494",
-    "place_url": "https://youtube.com/@yoga_teacher",
-    "crawled_at": "2026-05-20T06:00:50.369861+00:00"
   },
   {
     "source": "kakao",
@@ -19553,19 +18955,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1269484586_374038674",
-    "name": "호수요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 안양시 동안구 비산동 1026-5 2층",
-    "road_address": "경기도 안양시 동안구 운곡로 7 2층",
-    "x": "126.9484586",
-    "y": "37.4038674",
-    "place_url": "https://blog.naver.com/hosuyoga",
-    "crawled_at": "2026-05-20T06:00:58.816614+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1268804440_374166790",
     "name": "퍼니팝업스토어",
     "category": "컴퓨터프로그래밍,정보서비스업>인터넷상거래",
@@ -20033,19 +19422,6 @@
     "crawled_at": "2026-05-20T06:01:02.898531+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1271179180_367989788",
-    "name": "쁘램요가 쌍용점",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "충청남도 천안시 서북구 쌍용동 1539 2층 쁘램요가",
-    "road_address": "충청남도 천안시 서북구 월봉로 93 2층 쁘램요가",
-    "x": "127.117918",
-    "y": "36.7989788",
-    "place_url": "https://blog.naver.com/skde9881",
-    "crawled_at": "2026-05-20T06:01:02.898555+00:00"
-  },
-  {
     "source": "kakao",
     "source_id": "1053086093",
     "name": "더나은요가필라테스",
@@ -20057,19 +19433,6 @@
     "y": "36.7930801606431",
     "place_url": "http://place.map.kakao.com/1053086093",
     "crawled_at": "2026-05-20T06:01:06.320901+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271375729_368335589",
-    "name": "지금요가",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "충청남도 천안시 서북구 두정동 935 3층,301호",
-    "road_address": "충청남도 천안시 서북구 두정로 188 3층,301호",
-    "x": "127.1375729",
-    "y": "36.8335589",
-    "place_url": "https://blog.naver.com/jigeumyoga",
-    "crawled_at": "2026-05-20T06:01:06.264457+00:00"
   },
   {
     "source": "kakao",
@@ -20177,19 +19540,6 @@
   },
   {
     "source": "kakao",
-    "source_id": "553106789",
-    "name": "이서현 테라피 요가&필라테스",
-    "category": "스포츠,레저 > 스포츠시설 > 헬스클럽",
-    "phone": "",
-    "address": "충남 천안시 서북구 쌍용동 2100",
-    "road_address": "충남 천안시 서북구 봉서산1길 35",
-    "x": "127.121962783732",
-    "y": "36.8118771761677",
-    "place_url": "http://place.map.kakao.com/553106789",
-    "crawled_at": "2026-05-20T06:01:06.320914+00:00"
-  },
-  {
-    "source": "kakao",
     "source_id": "1655395192",
     "name": "인디요가 앤 필라테스",
     "category": "스포츠,레저 > 요가,필라테스",
@@ -20216,19 +19566,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1271337465_367751058",
-    "name": "클래식 요가 앤 필라테스",
-    "category": "스포츠시설>필라테스",
-    "phone": "",
-    "address": "충청남도 천안시 동남구 신방동 1540 한성프라자 4층 401~403",
-    "road_address": "충청남도 천안시 동남구 통정5로 67 한성프라자 4층 401~403",
-    "x": "127.1337465",
-    "y": "36.7751058",
-    "place_url": "https://www.instagram.com/classic_pilates_yoga",
-    "crawled_at": "2026-05-20T06:01:06.416786+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1271108630_368097350",
     "name": "머슬케어필라테스 천안점",
     "category": "스포츠시설>필라테스",
@@ -20252,19 +19589,6 @@
     "y": "36.822491",
     "place_url": "https://youtube.com/@Nar.r_m1nseeeeo",
     "crawled_at": "2026-05-20T06:01:06.416798+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271581926_368288126",
-    "name": "아로하요가",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "충청남도 천안시 동남구 신부동 289-42 304호",
-    "road_address": "충청남도 천안시 동남구 북일로 75 304호",
-    "x": "127.1581926",
-    "y": "36.8288126",
-    "place_url": "https://www.instagram.com/aroha_yoga",
-    "crawled_at": "2026-05-20T06:01:06.556346+00:00"
   },
   {
     "source": "kakao",
@@ -20658,19 +19982,6 @@
   },
   {
     "source": "kakao",
-    "source_id": "1380044975",
-    "name": "요가나무",
-    "category": "스포츠,레저 > 요가,필라테스 > 요가원",
-    "phone": "010-4712-2878",
-    "address": "경기 남양주시 평내동 271-4",
-    "road_address": "경기 남양주시 경춘로 1292-37",
-    "x": "127.238366290531",
-    "y": "37.6486708796142",
-    "place_url": "http://place.map.kakao.com/1380044975",
-    "crawled_at": "2026-05-20T06:01:09.113272+00:00"
-  },
-  {
-    "source": "kakao",
     "source_id": "1069632676",
     "name": "디브야 요가",
     "category": "스포츠,레저 > 요가,필라테스 > 요가원",
@@ -20905,19 +20216,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1272153473_375867266",
-    "name": "파드마 요가원",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 남양주시 와부읍 덕소리 496-1 201호",
-    "road_address": "경기도 남양주시 와부읍 덕소로97번길 29-1 201호",
-    "x": "127.2153473",
-    "y": "37.5867266",
-    "place_url": "http://www.instagram.com/nurisol.tree",
-    "crawled_at": "2026-05-20T06:01:14.545440+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1272457485_376578256",
     "name": "키아라요가 남양주 호평점",
     "category": "스포츠시설>요가원",
@@ -20928,45 +20226,6 @@
     "y": "37.6578256",
     "place_url": "http://pf.kakao.com/_nxfxakn",
     "crawled_at": "2026-05-20T06:01:14.545446+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271403145_376048244",
-    "name": "다인요가필라테스",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 구리시 인창동 670-5 삼원골드프라자 6층 다인요가필라테스",
-    "road_address": "경기도 구리시 건원대로 42 삼원골드프라자 6층 다인요가필라테스",
-    "x": "127.1403145",
-    "y": "37.6048244",
-    "place_url": "https://blog.naver.com/dainyogapilates_/224164346714",
-    "crawled_at": "2026-05-20T06:01:14.680211+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271223697_374950685",
-    "name": "아이리스요가 앤 필라테스",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "서울특별시 송파구 가락본동 78 아이티벤처타워 지하 1층",
-    "road_address": "서울특별시 송파구 중대로 135 아이티벤처타워 지하 1층",
-    "x": "127.1223697",
-    "y": "37.4950685",
-    "place_url": "https://www.instagram.com/irisyoga_pilates_",
-    "crawled_at": "2026-05-20T06:01:14.680217+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1272461179_376578552",
-    "name": "톨라요가스튜디오",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "경기도 남양주시 호평동 173-1 예담빌딩 4층",
-    "road_address": "경기도 남양주시 호평로45번길 24 예담빌딩 4층",
-    "x": "127.2461179",
-    "y": "37.6578552",
-    "place_url": "",
-    "crawled_at": "2026-05-20T06:01:14.827697+00:00"
   },
   {
     "source": "kakao",
@@ -21019,19 +20278,6 @@
     "y": "37.166267",
     "place_url": "https://blog.naver.com/blissstudio_dongtan",
     "crawled_at": "2026-05-20T06:01:15.248994+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1270415697_372076550",
-    "name": "솔요가스튜디오 병점점",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 화성시 병점구 병점동 305-1 202호",
-    "road_address": "경기도 화성시 병점구 병점중앙로 102 202호",
-    "x": "127.0415697",
-    "y": "37.207655",
-    "place_url": "https://www.instagram.com/sol_yogastudio",
-    "crawled_at": "2026-05-20T06:01:15.249014+00:00"
   },
   {
     "source": "naver",
@@ -21438,19 +20684,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1271096406_371687303",
-    "name": "프레젠트요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 화성시 동탄구 산척동 727-8",
-    "road_address": "경기도 화성시 동탄구 동탄대로6길 27 204, 205호",
-    "x": "127.1096406",
-    "y": "37.1687303",
-    "place_url": "https://www.instagram.com/presentyoga.dongtan",
-    "crawled_at": "2026-05-20T06:01:18.740192+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1269810191_372234012",
     "name": "이니무브바디짐",
     "category": "스포츠시설>요가원",
@@ -21591,45 +20824,6 @@
     "y": "37.3468301735228",
     "place_url": "http://place.map.kakao.com/1577101051",
     "crawled_at": "2026-05-20T06:01:24.893790+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1269703872_372190954",
-    "name": "아름다운핫요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 화성시 효행구 봉담읍 동화리 215 동화프라자 2차 401호",
-    "road_address": "경기도 화성시 효행구 봉담읍 동화서북안2길 9 동화프라자 2차 401호",
-    "x": "126.9703872",
-    "y": "37.2190954",
-    "place_url": "https://www.instagram.com/beautifulhotyoga",
-    "crawled_at": "2026-05-20T06:01:25.007893+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1269455248_372275090",
-    "name": "아름다운핫요가 2호점",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 화성시 효행구 봉담읍 상리 685-3 MG빌딩 308호",
-    "road_address": "경기도 화성시 효행구 봉담읍 상리중심상가길 28-18 MG빌딩 308호",
-    "x": "126.9455248",
-    "y": "37.227509",
-    "place_url": "https://www.instagram.com/beautifulhotyoga/",
-    "crawled_at": "2026-05-20T06:01:25.007910+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1270722751_372057103",
-    "name": "소마요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 화성시 동탄구 반송동 91-1 8층 801호",
-    "road_address": "경기도 화성시 동탄구 동탄중심상가2길 2 8층 801호",
-    "x": "127.0722751",
-    "y": "37.2057103",
-    "place_url": "https://blog.naver.com/somayoga314",
-    "crawled_at": "2026-05-20T06:01:25.135775+00:00"
   },
   {
     "source": "naver",
@@ -22309,19 +21503,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1264906555_334815193",
-    "name": "쁘램요가 제주점",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "제주특별자치도 제주시 연동 1372-3 3층",
-    "road_address": "제주특별자치도 제주시 연북로 88 3층",
-    "x": "126.4906555",
-    "y": "33.4815193",
-    "place_url": "https://www.instagram.com/prem_jeju",
-    "crawled_at": "2026-05-20T06:01:29.633907+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1264816257_334832497",
     "name": "제주요가 느림원",
     "category": "스포츠시설>요가원",
@@ -22618,19 +21799,6 @@
     "y": "33.2526202",
     "place_url": "",
     "crawled_at": "2026-05-20T06:01:33.956879+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1265266654_334961322",
-    "name": "요가스튜디오 온유",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "제주특별자치도 제주시 도남동 909-10 2층",
-    "road_address": "제주특별자치도 제주시 도남로 46 2층",
-    "x": "126.5266654",
-    "y": "33.4961322",
-    "place_url": "http://pf.kakao.com/_FBpkxj",
-    "crawled_at": "2026-05-20T06:01:34.095699+00:00"
   },
   {
     "source": "naver",
@@ -22933,32 +22101,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1288087614_352029656",
-    "name": "장유요가원",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경상남도 김해시 부곡동 1161-11 장유제일프라자 3층 303호",
-    "road_address": "경상남도 김해시 능동로 161 장유제일프라자 3층 303호",
-    "x": "128.8087614",
-    "y": "35.2029656",
-    "place_url": "https://blog.naver.com/leethth",
-    "crawled_at": "2026-05-20T06:01:36.292600+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1288645326_352321054",
-    "name": "서민숙요가센타",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경상남도 김해시 외동 1249-4",
-    "road_address": "경상남도 김해시 함박로 102",
-    "x": "128.8645326",
-    "y": "35.2321054",
-    "place_url": "https://blog.naver.com/mslove008",
-    "crawled_at": "2026-05-20T06:01:36.292619+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1288670969_352328187",
     "name": "미요가원",
     "category": "스포츠시설>요가원",
@@ -23060,19 +22202,6 @@
     "y": "35.2455669945311",
     "place_url": "http://place.map.kakao.com/526685847",
     "crawled_at": "2026-05-20T06:01:38.524947+00:00"
-  },
-  {
-    "source": "kakao",
-    "source_id": "1991457776",
-    "name": "요가베리필라테스",
-    "category": "스포츠,레저 > 요가,필라테스",
-    "phone": "055-311-0433",
-    "address": "경남 김해시 신문동 1283",
-    "road_address": "경남 김해시 장유로334번길 56",
-    "x": "128.811884053046",
-    "y": "35.1937320132065",
-    "place_url": "http://place.map.kakao.com/1991457776",
-    "crawled_at": "2026-05-20T06:01:38.524950+00:00"
   },
   {
     "source": "kakao",
@@ -23180,19 +22309,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1288152021_351961924",
-    "name": "요가베리필라테스",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경상남도 김해시 신문동 503-1 2층 요가베리필라테스",
-    "road_address": "경상남도 김해시 장유로334번길 14-2 2층 요가베리필라테스",
-    "x": "128.8152021",
-    "y": "35.1961924",
-    "place_url": "https://www.instagram.com/yogaberry0433",
-    "crawled_at": "2026-05-20T06:01:38.760013+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1288135620_351699501",
     "name": "요가, 본",
     "category": "스포츠시설>요가원",
@@ -23203,19 +22319,6 @@
     "y": "35.1699501",
     "place_url": "https://www.instagram.com/yogabon.yulha",
     "crawled_at": "2026-05-20T06:01:38.760018+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1289045383_352440224",
-    "name": "인디아앤핫요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경상남도 김해시 어방동 529-5",
-    "road_address": "경상남도 김해시 인제로170번길 5",
-    "x": "128.9045383",
-    "y": "35.2440224",
-    "place_url": "https://blog.naver.com/sasi1005/221225714147",
-    "crawled_at": "2026-05-20T06:01:38.882792+00:00"
   },
   {
     "source": "kakao",
@@ -23595,19 +22698,6 @@
     "crawled_at": "2026-05-20T06:01:41.451230+00:00"
   },
   {
-    "source": "naver",
-    "source_id": "naver_1271914526_375604959",
-    "name": "요가그릿 하남미사점",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 하남시 망월동 1119 스타파크빌딩 2층",
-    "road_address": "경기도 하남시 미사강변남로 87 스타파크빌딩 2층",
-    "x": "127.1914526",
-    "y": "37.5604959",
-    "place_url": "https://blog.naver.com/yogagritmisa",
-    "crawled_at": "2026-05-20T06:01:41.451254+00:00"
-  },
-  {
     "source": "kakao",
     "source_id": "1888925370",
     "name": "인어스필라테스&요가 하남신장점",
@@ -23723,19 +22813,6 @@
     "y": "37.5637858",
     "place_url": "http://pf.kakao.com/_CZxiXxb",
     "crawled_at": "2026-05-20T06:01:43.515500+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1271910617_375662445",
-    "name": "아쉬탕가 마르가 요가원",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 하남시 망월동 1093 경서타워 3층 304호",
-    "road_address": "경기도 하남시 미사강변동로 127 경서타워 3층 304호",
-    "x": "127.1910617",
-    "y": "37.5662445",
-    "place_url": "https://www.instagram.com/ashtanga__marga",
-    "crawled_at": "2026-05-20T06:01:43.515519+00:00"
   },
   {
     "source": "naver",
@@ -23999,32 +23076,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1270455877_377481070",
-    "name": "요가라인",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 의정부시 의정부동 228-26 플러스빌딩 3층",
-    "road_address": "경기도 의정부시 평화로 630 플러스빌딩 3층",
-    "x": "127.0455877",
-    "y": "37.748107",
-    "place_url": "https://www.instagram.com/yogaline_/",
-    "crawled_at": "2026-05-20T06:01:46.224031+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1270460831_377244778",
-    "name": "암리타요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 의정부시 호원동 51-2 5층 505호",
-    "road_address": "경기도 의정부시 외미로 95 5층 505호",
-    "x": "127.0460831",
-    "y": "37.7244778",
-    "place_url": "https://www.instagram.com/amritayoga.ujb",
-    "crawled_at": "2026-05-20T06:01:46.224056+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1270465894_377246739",
     "name": "웰리스요가&amp;플라잉&amp;필라테스",
     "category": "스포츠시설>요가원",
@@ -24165,19 +23216,6 @@
     "y": "37.7311053",
     "place_url": "https://blog.naver.com/yoga_hye_yum",
     "crawled_at": "2026-05-20T06:01:48.271751+00:00"
-  },
-  {
-    "source": "naver",
-    "source_id": "naver_1270637702_377478940",
-    "name": "어스요가",
-    "category": "스포츠,레크레이션교육>요가,명상",
-    "phone": "",
-    "address": "경기도 의정부시 신곡동 755-2 풍림아이원아파트 상가동 2층 202호",
-    "road_address": "경기도 의정부시 추동로91번길 15 풍림아이원아파트 상가동 2층 202호",
-    "x": "127.0637702",
-    "y": "37.747894",
-    "place_url": "https://m.booking.naver.com/booking/6/bizes/832240",
-    "crawled_at": "2026-05-20T06:01:48.271756+00:00"
   },
   {
     "source": "kakao",
@@ -24506,19 +23544,6 @@
   },
   {
     "source": "naver",
-    "source_id": "naver_1268175208_372852370",
-    "name": "해달요가",
-    "category": "스포츠시설>요가원",
-    "phone": "",
-    "address": "경기도 화성시 만세구 새솔동 76-5",
-    "road_address": "경기도 화성시 만세구 수노을중앙로 126 나이스프라자 6층 603호 해달요가",
-    "x": "126.8175208",
-    "y": "37.285237",
-    "place_url": "https://blog.naver.com/sunmoonyoga",
-    "crawled_at": "2026-05-20T06:39:31.422414+00:00"
-  },
-  {
-    "source": "naver",
     "source_id": "naver_1270443074_372631877",
     "name": "요가,바나",
     "category": "스포츠시설>요가원",
@@ -24529,5 +23554,96 @@
     "y": "37.2631877",
     "place_url": "",
     "crawled_at": "2026-05-20T18:01:42.139627+00:00"
+  },
+  {
+    "source": "kakao",
+    "source_id": "127542754",
+    "name": "시이작",
+    "category": "스포츠,레저 > 요가,필라테스 > 요가원",
+    "phone": "0502-5550-8441",
+    "address": "서울 서대문구 연희동 128-25",
+    "road_address": "서울 서대문구 연희로11나길 5",
+    "x": "126.928321435594",
+    "y": "37.5674936351091",
+    "place_url": "http://place.map.kakao.com/127542754",
+    "crawled_at": "2026-05-22T12:59:26.235281+00:00"
+  },
+  {
+    "source": "kakao",
+    "source_id": "1006476691",
+    "name": "슈리필라테스 락슈미요가",
+    "category": "스포츠,레저 > 요가,필라테스",
+    "phone": "032-431-5333",
+    "address": "인천 남동구 논현동 746-3",
+    "road_address": "인천 남동구 논고개로 81",
+    "x": "126.72589827826296",
+    "y": "37.39868744750942",
+    "place_url": "http://place.map.kakao.com/1006476691",
+    "crawled_at": "2026-05-22T13:00:09.613128+00:00"
+  },
+  {
+    "source": "kakao",
+    "source_id": "9892120",
+    "name": "요가플러스",
+    "category": "스포츠,레저 > 요가,필라테스 > 요가원",
+    "phone": "042-528-0528",
+    "address": "대전 서구 내동 164-2",
+    "road_address": "대전 서구 동서대로 971",
+    "x": "127.370504013095",
+    "y": "36.3345792984399",
+    "place_url": "http://place.map.kakao.com/9892120",
+    "crawled_at": "2026-05-22T13:00:30.723643+00:00"
+  },
+  {
+    "source": "naver",
+    "source_id": "naver_1271504976_358607439",
+    "name": "윔지컬스튜디오",
+    "category": "학원 등 교습시설>연기교육",
+    "phone": "",
+    "address": "전북특별자치도 전주시 덕진구 호성동1가 587-35 3층 302호",
+    "road_address": "전북특별자치도 전주시 덕진구 호성3길 20 3층 302호",
+    "x": "127.1504976",
+    "y": "35.8607439",
+    "place_url": "https://blog.naver.com/whimsical_studio",
+    "crawled_at": "2026-05-22T13:01:53.408658+00:00"
+  },
+  {
+    "source": "kakao",
+    "source_id": "2063764495",
+    "name": "영어요가",
+    "category": "스포츠,레저 > 요가,필라테스 > 요가원",
+    "phone": "",
+    "address": "전북특별자치도 전주시 완산구 서완산동1가 25",
+    "road_address": "전북특별자치도 전주시 완산구 완산2길 23-3",
+    "x": "127.139783394907",
+    "y": "35.8097026521648",
+    "place_url": "http://place.map.kakao.com/2063764495",
+    "crawled_at": "2026-05-22T13:01:57.037359+00:00"
+  },
+  {
+    "source": "kakao",
+    "source_id": "809053742",
+    "name": "요가무드",
+    "category": "스포츠,레저 > 요가,필라테스 > 요가원",
+    "phone": "010-3171-1245",
+    "address": "경기 시흥시 은행동 646-12",
+    "road_address": "경기 시흥시 은계번영길 27",
+    "x": "126.803959930947",
+    "y": "37.4365348932438",
+    "place_url": "http://place.map.kakao.com/809053742",
+    "crawled_at": "2026-05-22T13:03:03.323610+00:00"
+  },
+  {
+    "source": "naver",
+    "source_id": "naver_1268534991_373779544",
+    "name": "요가 희 시흥본점",
+    "category": "스포츠시설>요가원",
+    "phone": "",
+    "address": "경기도 시흥시 조남동 657 308",
+    "road_address": "경기도 시흥시 목감남서로 9-27 308",
+    "x": "126.8534991",
+    "y": "37.3779544",
+    "place_url": "https://youtube.com/@yogaheeya",
+    "crawled_at": "2026-05-22T13:03:05.407686+00:00"
   }
 ]

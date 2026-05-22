@@ -18,7 +18,7 @@
     "avg_rating": null,
     "review_count": 0,
     "data_source": "naver_local",
-    "scraped_at": "2026-05-19T21:23:06.730496+00:00",
+    "scraped_at": "2026-05-22T12:59:19.251608+00:00",
     "instructor_trust_score": 0.0
   },
   {
@@ -40,7 +40,7 @@
     "avg_rating": null,
     "review_count": 0,
     "data_source": "naver_local",
-    "scraped_at": "2026-05-19T21:23:06.730524+00:00",
+    "scraped_at": "2026-05-22T12:59:19.251637+00:00",
     "instructor_trust_score": 0.0
   },
   {
@@ -62,7 +62,7 @@
     "avg_rating": null,
     "review_count": 0,
     "data_source": "naver_local",
-    "scraped_at": "2026-05-19T21:23:27.692334+00:00",
+    "scraped_at": "2026-05-22T12:59:51.287612+00:00",
     "instructor_trust_score": 0.0
   },
   {
@@ -84,7 +84,7 @@
     "avg_rating": null,
     "review_count": 0,
     "data_source": "naver_local",
-    "scraped_at": "2026-05-19T21:23:36.372016+00:00",
+    "scraped_at": "2026-05-22T13:00:03.163359+00:00",
     "instructor_trust_score": 0.0
   },
   {
@@ -106,7 +106,7 @@
     "avg_rating": null,
     "review_count": 0,
     "data_source": "naver_local",
-    "scraped_at": "2026-05-19T21:23:50.738534+00:00",
+    "scraped_at": "2026-05-22T13:00:23.389585+00:00",
     "instructor_trust_score": 0.0
   }
 ]
