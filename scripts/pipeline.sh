@@ -26,6 +26,16 @@
 set -euo pipefail
 export PATH="/usr/local/bin:$PATH"
 
+BOOTSTRAP_REPO_DIR="${REPO_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+ENV_FILE="${ENV_FILE:-$BOOTSTRAP_REPO_DIR/.crawl_automation.env}"
+
+if [[ -f "$ENV_FILE" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+fi
+
 # ── Config ────────────────────────────────────────────────────────────────────
 REPO_DIR="${REPO_DIR:-/home/ubuntu/yoga-crawler}"
 SCRIPTS_DIR="${SCRIPTS_DIR:-$REPO_DIR/scripts}"
