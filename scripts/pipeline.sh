@@ -390,12 +390,16 @@ fi
 if ! $DRY_RUN && [[ "$AUTO_GIT_SYNC" == "true" ]]; then
   echo ""
   echo ">>> Git sync — auto-publishing crawl data to ${GIT_SYNC_BRANCH}..."
+  _PIPELINE_BRANCH=$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo master)
   "$PYTHON_BIN" "$SCRIPTS_DIR/git_watch.py" \
     --once \
     --branch "$GIT_SYNC_BRANCH" \
     --create-branch \
     && echo "    ✓ git sync: OK" \
     || echo "    ✗ git sync: FAILED (continuing)"
+  # Ensure we are back on the working branch regardless of what git_watch did
+  git -C "$REPO_ROOT" checkout "$_PIPELINE_BRANCH" --quiet 2>/dev/null || true
+  echo "    branch restored → $_PIPELINE_BRANCH"
 fi
 
 echo "=============================="
