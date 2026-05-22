@@ -33,6 +33,9 @@ Usage
 
   # Push once immediately and exit
   python scripts/git_watch.py --once
+
+    # Auto-publish crawl output to a dedicated branch
+    python scripts/git_watch.py --once --branch crawl-data --create-branch
 """
 
 from __future__ import annotations
@@ -59,7 +62,7 @@ log = logging.getLogger("git_watch")
 # ── Config ────────────────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MAX_FILE_KB = 500   # block files larger than this (scripts)
-MAX_DATA_FILE_KB = 10240   # 10 MB cap for data JSON files
+MAX_DATA_FILE_KB = 25600   # 25 MB cap for crawl snapshots (CSV/JSON/SQL)
 
 # Commit groups: (label, list of glob patterns, optional size override KB)
 COMMIT_GROUPS: list[tuple[str, list[str], int]] = [
@@ -70,7 +73,9 @@ COMMIT_GROUPS: list[tuple[str, list[str], int]] = [
     ("config: dependencies and environment",  ["requirements.txt", ".env.example",
                                                ".gitignore"],                        MAX_FILE_KB),
     ("docs: README and project docs",         ["*.md", "docs/**"],                  MAX_FILE_KB),
-    ("data: crawl output",                    ["data/**/*.json", "data/**/*.sql"],   MAX_DATA_FILE_KB),
+    ("data: crawl output",                    ["data/*.json", "data/*.sql", "data/*.csv",
+                                               "data/**/*.json", "data/**/*.sql", "data/**/*.csv"],
+                                                                                         MAX_DATA_FILE_KB),
 ]
 CATCH_ALL_LABEL = "chore: miscellaneous updates"
 
@@ -90,6 +95,43 @@ def git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
         ["git", "-C", str(REPO_ROOT)] + args,
         capture_output=True, text=True, check=check
     )
+
+
+def current_branch() -> str:
+    result = git(["rev-parse", "--abbrev-ref", "HEAD"], check=False)
+    branch = result.stdout.strip()
+    if not branch or branch == "HEAD":
+        return "master"
+    return branch
+
+
+def ensure_branch(branch: str | None, create_branch: bool, dry_run: bool) -> str:
+    target = branch or os.environ.get("GIT_SYNC_BRANCH") or current_branch()
+    current = current_branch()
+
+    if target == current:
+        return target
+
+    if dry_run:
+        log.info("[DRY-RUN] Would switch from %s to %s", current, target)
+        return target
+
+    if git(["show-ref", "--verify", f"refs/heads/{target}"], check=False).returncode == 0:
+        result = git(["checkout", target], check=False)
+    elif git(["ls-remote", "--exit-code", "--heads", "origin", target], check=False).returncode == 0:
+        result = git(["checkout", "-b", target, "--track", f"origin/{target}"], check=False)
+    elif create_branch:
+        result = git(["checkout", "-b", target], check=False)
+    else:
+        raise RuntimeError(
+            f"Branch '{target}' does not exist locally or on origin. "
+            "Pass --create-branch to create it."
+        )
+
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or f"Failed to checkout branch '{target}'")
+
+    return target
 
 
 def changed_files() -> list[str]:
@@ -162,24 +204,25 @@ def commit_files(files: list[str], message: str, dry_run: bool, max_kb: int = MA
         return False
 
 
-def push(dry_run: bool) -> None:
+def push(branch: str, dry_run: bool) -> None:
     if dry_run:
-        log.info("[DRY-RUN] Would push to origin master")
+        log.info("[DRY-RUN] Would push to origin %s", branch)
         return
 
-    log.info("Pushing to origin...")
-    result = git(["push", "origin", "master"], check=False)
+    log.info("Pushing to origin/%s...", branch)
+    result = git(["push", "-u", "origin", branch], check=False)
     if result.returncode == 0:
         log.info("Push OK")
     else:
         log.error("Push failed: %s", result.stderr.strip())
 
 
-def run_once(dry_run: bool) -> int:
+def run_once(dry_run: bool, branch: str | None = None, create_branch: bool = False) -> int:
     """
     Detect changes, commit in groups, push.
     Returns number of commits made.
     """
+    target_branch = ensure_branch(branch, create_branch, dry_run)
     all_changed = changed_files()
     eligible = [f for f in all_changed if not is_blocked(f)]
 
@@ -206,7 +249,7 @@ def run_once(dry_run: bool) -> int:
             committed += 1
 
     if committed > 0:
-        push(dry_run)
+        push(target_branch, dry_run)
     else:
         log.info("No new commits to push.")
 
@@ -216,10 +259,13 @@ def run_once(dry_run: bool) -> int:
 # ── Watch loop ─────────────────────────────────────────────────────────────────
 
 class Watcher:
-    def __init__(self, interval: int, settle: int, dry_run: bool):
+    def __init__(self, interval: int, settle: int, dry_run: bool,
+                 branch: str | None, create_branch: bool):
         self.interval = interval
         self.settle   = settle
         self.dry_run  = dry_run
+        self.branch   = branch
+        self.create_branch = create_branch
         self._stop    = False
         self._last_snapshot: set[str] = set()
         self._stable_since: float = 0.0
@@ -235,9 +281,11 @@ class Watcher:
         return set(changed_files())
 
     def run(self):
+        target_branch = self.branch or os.environ.get("GIT_SYNC_BRANCH") or current_branch()
         log.info("git_watch started (interval=%ds, settle=%ds, dry_run=%s)",
                  self.interval, self.settle, self.dry_run)
         log.info("Repo: %s", REPO_ROOT)
+        log.info("Target branch: %s", target_branch)
         log.info("Press Ctrl-C to stop.")
 
         while not self._stop:
@@ -257,7 +305,7 @@ class Watcher:
                 ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
                 log.info("Files stable since %ds ago — committing... [%s]",
                          int(now - self._stable_since), ts)
-                run_once(self.dry_run)
+                run_once(self.dry_run, self.branch, self.create_branch)
                 self._last_snapshot = set()   # reset after commit
                 self._stable_since  = 0.0
 
@@ -282,6 +330,10 @@ def parse_args() -> argparse.Namespace:
                    help="Show what would be committed without writing")
     p.add_argument("--once", action="store_true",
                    help="Commit and push any current changes once, then exit")
+    p.add_argument("--branch", default=None,
+                   help="Target branch for auto-publish (defaults to GIT_SYNC_BRANCH or current branch)")
+    p.add_argument("--create-branch", action="store_true",
+                   help="Create the target branch locally if it does not exist")
     p.add_argument("--verbose", action="store_true")
     return p.parse_args()
 
@@ -294,7 +346,7 @@ def main():
 
     if args.once:
         log.info("--once mode: committing current changes and exiting")
-        n = run_once(args.dry_run)
+        n = run_once(args.dry_run, args.branch, args.create_branch)
         log.info("Done — %d commit(s) made", n)
         sys.exit(0)
 
@@ -302,6 +354,8 @@ def main():
         interval=args.interval,
         settle=args.settle,
         dry_run=args.dry_run,
+        branch=args.branch,
+        create_branch=args.create_branch,
     )
     watcher.run()
 
