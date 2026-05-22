@@ -337,14 +337,20 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--pages", type=int, default=10,
                    help="Pages to scrape from Yoga Alliance directory")
     p.add_argument("--delay", type=float, default=2.0)
+    p.add_argument("--out-dir", type=Path, default=OUT_DIR,
+                   help="Output directory for JSON/SQL files")
+    p.add_argument("--dry-run", action="store_true",
+                   help="Accepted for pipeline compatibility; skips file writes and S3 sync")
     p.add_argument("--s3-sync", action="store_true")
-    p.add_argument("--dry-run", action="store_true", help="No-op: accepted for pipeline compatibility")
     return p.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out_dir = args.out_dir
+    out_json = out_dir / "associations_raw.json"
+    out_sql = out_dir / "associations_seed.sql"
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     results: list[dict] = []
 
@@ -372,14 +378,20 @@ def main() -> None:
 
     log.info("Total associations (deduped): %d", len(deduped))
 
-    OUT_JSON.write_text(json.dumps(deduped, ensure_ascii=False, indent=2), encoding="utf-8")
-    log.info("Wrote %s", OUT_JSON)
+    if args.dry_run:
+        log.info("[DRY-RUN] Would write %s", out_json)
+        log.info("[DRY-RUN] Would write %s", out_sql)
+        log.info("Done — %d associations found", len(deduped))
+        return
 
-    OUT_SQL.write_text(to_sql(deduped), encoding="utf-8")
-    log.info("Wrote %s", OUT_SQL)
+    out_json.write_text(json.dumps(deduped, ensure_ascii=False, indent=2), encoding="utf-8")
+    log.info("Wrote %s", out_json)
+
+    out_sql.write_text(to_sql(deduped), encoding="utf-8")
+    log.info("Wrote %s", out_sql)
 
     if args.s3_sync:
-        s3_sync(OUT_DIR, S3_BUCKET)
+        s3_sync(out_dir, S3_BUCKET)
 
     log.info("Done — %d associations saved", len(deduped))
 
