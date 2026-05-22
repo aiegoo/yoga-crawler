@@ -51,6 +51,8 @@ AUTO_GIT_SYNC="${AUTO_GIT_SYNC:-true}"
 GIT_SYNC_BRANCH="${GIT_SYNC_BRANCH:-crawl-data}"
 AUTO_EXPORT_SNAPSHOTS="${AUTO_EXPORT_SNAPSHOTS:-true}"
 EXPORT_TABLES="${EXPORT_TABLES:-studios instructors classes}"
+INSTRUCTOR_PROFILE_SEED_URL="${INSTRUCTOR_PROFILE_SEED_URL:-https://elbee.yogaman.club}"
+INSTRUCTOR_PROFILE_SEED_FILE="${INSTRUCTOR_PROFILE_SEED_FILE:-}"
 
 DRY_RUN=false
 ONLY=""
@@ -247,6 +249,23 @@ if [[ -z "$ONLY" || "$ONLY" == "instructor_profiles" ]]; then
   launch "instructor_profiles" bash -c "
     set -euo pipefail
     source '$VENV_DIR/bin/activate'
+    if [[ -n '$INSTRUCTOR_PROFILE_SEED_URL' && -n '$INSTRUCTOR_PROFILE_SEED_FILE' ]]; then
+      '$PYTHON_BIN' '$SCRIPTS_DIR/scrape_instructor_profiles.py' \
+        --source seed \
+        --seed-url '$INSTRUCTOR_PROFILE_SEED_URL' \
+        --seed-file '$INSTRUCTOR_PROFILE_SEED_FILE' \
+        $DRY_FLAG
+    elif [[ -n '$INSTRUCTOR_PROFILE_SEED_URL' ]]; then
+      '$PYTHON_BIN' '$SCRIPTS_DIR/scrape_instructor_profiles.py' \
+        --source seed \
+        --seed-url '$INSTRUCTOR_PROFILE_SEED_URL' \
+        $DRY_FLAG
+    elif [[ -n '$INSTRUCTOR_PROFILE_SEED_FILE' ]]; then
+      '$PYTHON_BIN' '$SCRIPTS_DIR/scrape_instructor_profiles.py' \
+        --source seed \
+        --seed-file '$INSTRUCTOR_PROFILE_SEED_FILE' \
+        $DRY_FLAG
+    fi
     '$PYTHON_BIN' '$SCRIPTS_DIR/scrape_instructor_profiles.py' \\
       --source taling \\
       --delay 1.2 \\
