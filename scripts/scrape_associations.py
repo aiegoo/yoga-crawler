@@ -339,11 +339,17 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--delay", type=float, default=2.0)
     p.add_argument("--s3-sync", action="store_true")
     p.add_argument("--dry-run", action="store_true", help="No-op: accepted for pipeline compatibility")
+    p.add_argument("--out-dir", default=None, help="Override output directory for JSON/SQL files")
     return p.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    global OUT_DIR, OUT_JSON, OUT_SQL
+    if args.out_dir:
+        OUT_DIR = Path(args.out_dir)
+        OUT_JSON = OUT_DIR / "associations_raw.json"
+        OUT_SQL  = OUT_DIR / "associations_seed.sql"
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     results: list[dict] = []
