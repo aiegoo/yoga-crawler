@@ -51,11 +51,20 @@ import time
 import random
 from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import urlparse
 
 import httpx
 import psycopg2
 import psycopg2.extras
 from bs4 import BeautifulSoup
+
+try:
+    import pytesseract  # type: ignore
+    from PIL import Image  # type: ignore
+    from io import BytesIO
+    _OCR_AVAILABLE = True
+except Exception:
+    _OCR_AVAILABLE = False
 
 logging.basicConfig(
     level=logging.INFO,
@@ -98,6 +107,197 @@ KR_CITIES = [
     "수원", "고양", "창원", "성남", "청주", "전주", "안산",
     "안양", "남양주", "화성", "평택", "용인",
 ]
+
+
+def _is_schedule_image_text(raw_text: str) -> bool:
+    low = (raw_text or "").lower()
+    keywords = [
+        "시간표", "스케줄", "timetable", "schedule", "class schedule",
+        "월", "화", "수", "목", "금", "토", "일", "monday", "tuesday",
+    ]
+    has_time = bool(re.search(r"\d{1,2}:\d{2}", low))
+    return has_time and any(k in low for k in keywords)
+
+
+def _ocr_raw_text(image_bytes: bytes) -> str:
+    if not _OCR_AVAILABLE:
+        return ""
+    img = Image.open(BytesIO(image_bytes))
+    return pytesseract.image_to_string(img, lang="kor+eng")
+
+
+def _normalize_day(tok: str) -> str | None:
+    t = tok.strip().lower()
+    mapping = {
+        "월": "Mon", "화": "Tue", "수": "Wed", "목": "Thu", "금": "Fri", "토": "Sat", "일": "Sun",
+        "mon": "Mon", "monday": "Mon", "tue": "Tue", "tuesday": "Tue", "wed": "Wed", "wednesday": "Wed",
+        "thu": "Thu", "thursday": "Thu", "fri": "Fri", "friday": "Fri", "sat": "Sat", "saturday": "Sat",
+        "sun": "Sun", "sunday": "Sun",
+    }
+    return mapping.get(t)
+
+
+def _parse_timetable_from_text(raw_text: str) -> dict | None:
+    """Parse OCR text lines into a simple timetable shape.
+
+    Expected forms include:
+      월 화 수 목 금
+      09:00~10:00 하타 빈야사 ...
+    """
+    lines = [l.strip() for l in raw_text.splitlines() if l.strip()]
+    if not lines:
+        return None
+
+    day_header: list[str] = []
+    time_re = re.compile(r"\d{1,2}:\d{2}")
+    slots: list[dict[str, Any]] = []
+
+    for line in lines:
+        pieces = [p for p in re.split(r"[\s|/\\]+", line) if p]
+        day_hits = [_normalize_day(p) for p in pieces]
+        day_hits = [d for d in day_hits if d]
+        if len(day_hits) >= 3 and not time_re.search(line):
+            day_header = day_hits
+            continue
+
+        if not time_re.search(line):
+            continue
+
+        m = re.search(r"(\d{1,2}:\d{2})\s*[~\-–]\s*(\d{1,2}:\d{2})", line)
+        if not m:
+            continue
+        start, end = m.group(1), m.group(2)
+        rest = line[m.end():].strip()
+        if not rest or not day_header:
+            continue
+        cells = [c.strip() for c in re.split(r"\s{2,}|\t|\|", rest) if c.strip()]
+        if not cells:
+            continue
+        class_map = {day: cells[i] for i, day in enumerate(day_header) if i < len(cells)}
+        if class_map:
+            slots.append({
+                "time": f"{start}-{end}",
+                "start": start,
+                "end": end,
+                "classes": class_map,
+            })
+
+    if not slots:
+        return None
+    return {"days": day_header, "slots": slots}
+
+
+def _extract_kakao_candidate_image_urls(soup: BeautifulSoup, html_text: str) -> list[str]:
+    urls: list[str] = []
+
+    for meta in soup.select("meta[property='og:image']"):
+        content = (meta.get("content") or "").strip()
+        if content.startswith("http"):
+            urls.append(content)
+
+    for img in soup.find_all("img"):
+        src = (img.get("src") or img.get("data-src") or "").strip()
+        if not src.startswith("http"):
+            continue
+        cls = " ".join(img.get("class") or []).lower()
+        alt = (img.get("alt") or "").lower()
+        if any(k in cls for k in ("photo", "news", "thumb", "img")) or any(k in alt for k in ("시간표", "스케줄", "schedule", "timetable")):
+            urls.append(src)
+
+    for pattern in [
+        r'https?://[^"\\\']+\\.(?:jpg|jpeg|png|webp)',
+        r'https?:\\/\\/[^"\\\']+\\.(?:jpg|jpeg|png|webp)',
+    ]:
+        for m in re.finditer(pattern, html_text, re.I):
+            urls.append(m.group(0).replace("\\/", "/"))
+
+    seen: set[str] = set()
+    out: list[str] = []
+    for u in urls:
+        if u in seen:
+            continue
+        seen.add(u)
+        host = (urlparse(u).netloc or "").lower()
+        if any(h in host for h in ("kakaocdn.net", "kakao.com", "daumcdn.net", "dn-")):
+            out.append(u)
+    return out
+
+
+def scrape_kakao_schedule_images(source_id: str, studio_id: int, studio_name: str,
+                                 client: httpx.Client, delay: float) -> list[dict[str, Any]]:
+    """OCR schedule-like images from a Kakao place page.
+
+    Emits class rows with source `kakao_place_image`.
+    """
+    if not _OCR_AVAILABLE:
+        return []
+
+    url = f"https://place.map.kakao.com/{source_id}"
+    rows: list[dict[str, Any]] = []
+    try:
+        r = client.get(url, timeout=12)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        image_urls = _extract_kakao_candidate_image_urls(soup, r.text)
+        if not image_urls:
+            return []
+
+        for idx, img_url in enumerate(image_urls[:6]):
+            try:
+                img = client.get(img_url, timeout=15)
+                img.raise_for_status()
+                raw = _ocr_raw_text(img.content)
+                if not _is_schedule_image_text(raw):
+                    continue
+
+                timetable = _parse_timetable_from_text(raw)
+                if not timetable or not timetable.get("slots"):
+                    continue
+
+                class_occ: dict[str, list[dict[str, str]]] = {}
+                for slot in timetable.get("slots", []):
+                    for day, class_name in (slot.get("classes") or {}).items():
+                        title = (class_name or "").strip()
+                        if len(title) < 2:
+                            continue
+                        if re.search(r"\bbreak\b|휴식|휴게", title, re.I):
+                            continue
+                        class_occ.setdefault(title, []).append({
+                            "day": day,
+                            "start": slot.get("start", ""),
+                            "end": slot.get("end", ""),
+                        })
+
+                for title, occ in class_occ.items():
+                    sid = hashlib.md5(f"kakao_img_{source_id}_{idx}_{title}".encode()).hexdigest()[:16]
+                    rows.append({
+                        "source": "kakao_place_image",
+                        "source_id": sid,
+                        "studio_id": studio_id,
+                        "title": title,
+                        "style": _infer_style(title),
+                        "schedule": {
+                            "type": "weekly_timetable",
+                            "source_page": url,
+                            "source_image_url": img_url,
+                            "source_image_index": idx,
+                            "days": timetable.get("days", []),
+                            "occurrences": occ,
+                            "ocr_preview": raw[:600],
+                        },
+                        "crawled_at": datetime.now(timezone.utc).isoformat(),
+                    })
+            except Exception as e:
+                log.debug(f"  kakao image parse failed ({studio_name}) {img_url}: {e}")
+                continue
+    except Exception as e:
+        log.debug(f"  kakao image schedule scrape failed {source_id}: {e}")
+    finally:
+        time.sleep(delay + random.uniform(0, 0.2))
+
+    if rows:
+        log.info(f"  kakao image OCR {source_id} ({studio_name}): {len(rows)} classes")
+    return rows
 
 
 # ── Kakao Place scraper ────────────────────────────────────────────────────
@@ -694,6 +894,11 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="Max studios to process (0 = all)")
     ap.add_argument("--delay", type=float, default=1.0, help="Base delay between requests (s)")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--kakao-image-ocr",
+        action="store_true",
+        help="Enable Kakao schedule image OCR fallback",
+    )
     ap.add_argument("--db-url", default=DB_URL)
     args = ap.parse_args()
 
@@ -710,6 +915,8 @@ def main():
         # ── Source 1: Kakao Place ─────────────────────────────────────────
         if args.source in ("kakao", "all"):
             log.info("=== Kakao Place timetables ===")
+            if args.kakao_image_ocr and not _OCR_AVAILABLE:
+                log.warning("Kakao image OCR requested but pytesseract/Pillow are unavailable")
             cur.execute("""
                 SELECT id, source_id, name FROM studios
                 WHERE source='kakao' AND source_id IS NOT NULL
@@ -721,6 +928,16 @@ def main():
 
             for s in studios:
                 rows = scrape_kakao_place(s["source_id"], s["id"], s["name"], client, args.delay)
+                if args.kakao_image_ocr and (not rows or len(rows) < 2):
+                    rows.extend(
+                        scrape_kakao_schedule_images(
+                            s["source_id"],
+                            s["id"],
+                            s["name"],
+                            client,
+                            args.delay,
+                        )
+                    )
                 if rows and not args.dry_run:
                     total_upserted += upsert_classes(rows, conn)
                 elif rows:
