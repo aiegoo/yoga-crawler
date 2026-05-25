@@ -1,10 +1,52 @@
 {
-  "exported_at": "2026-05-22T13:49:54.541437+00:00",
-  "snapshot": "2026-05-22T134954Z",
+  "exported_at": "2026-05-25T21:46:56.647161+00:00",
+  "snapshot": "20260525T214656Z",
   "tables": [
     {
+      "table": "studios",
+      "row_count": 50756,
+      "columns": [
+        "id",
+        "source",
+        "source_id",
+        "name",
+        "category",
+        "phone",
+        "address",
+        "road_address",
+        "lng",
+        "lat",
+        "location",
+        "place_url",
+        "crawled_at",
+        "search_vec",
+        "website",
+        "instagram",
+        "facebook",
+        "youtube",
+        "brand_parent",
+        "google_place_id",
+        "rating",
+        "review_count",
+        "price_level",
+        "reviews",
+        "opening_hours",
+        "popular_times",
+        "geohash",
+        "neighborhood",
+        "neighborhood_tags",
+        "facility_props",
+        "rag_payload",
+        "enriched_at"
+      ],
+      "snapshot_json": "data/exports/20260525T214656Z/studios.json",
+      "snapshot_csv": "data/exports/20260525T214656Z/studios.csv",
+      "latest_json": "data/exports/latest/studios.json",
+      "latest_csv": "data/exports/latest/studios.csv"
+    },
+    {
       "table": "instructors",
-      "row_count": 434,
+      "row_count": 454,
       "columns": [
         "id",
         "source",
@@ -30,10 +72,37 @@
         "rag_payload",
         "enriched_at"
       ],
-      "snapshot_json": "data/exports/2026-05-22T134954Z/instructors.json",
-      "snapshot_csv": "data/exports/2026-05-22T134954Z/instructors.csv",
+      "snapshot_json": "data/exports/20260525T214656Z/instructors.json",
+      "snapshot_csv": "data/exports/20260525T214656Z/instructors.csv",
       "latest_json": "data/exports/latest/instructors.json",
       "latest_csv": "data/exports/latest/instructors.csv"
+    },
+    {
+      "table": "classes",
+      "row_count": 78,
+      "columns": [
+        "id",
+        "studio_id",
+        "instructor_id",
+        "source",
+        "source_id",
+        "title",
+        "style",
+        "difficulty",
+        "pacing",
+        "duration_min",
+        "price",
+        "description",
+        "target_outcomes",
+        "contraindications",
+        "schedule",
+        "crawled_at",
+        "search_vec"
+      ],
+      "snapshot_json": "data/exports/20260525T214656Z/classes.json",
+      "snapshot_csv": "data/exports/20260525T214656Z/classes.csv",
+      "latest_json": "data/exports/latest/classes.json",
+      "latest_csv": "data/exports/latest/classes.csv"
     }
   ]
 }
