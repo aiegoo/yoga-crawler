@@ -43,7 +43,6 @@ log = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXPORT_ROOT = REPO_ROOT / "data" / "exports"
 DEFAULT_TABLES = ["studios", "instructors", "classes"]
-STREAM_BATCH_SIZE = 2000
 
 
 def get_conn():
@@ -110,6 +109,9 @@ def choose_order(columns: list[str]) -> str | None:
     return None
 
 
+STREAM_BATCH_SIZE = 2000  # rows fetched per round-trip from server-side cursor
+
+
 def normalize_value(value: Any) -> Any:
     if isinstance(value, Decimal):
         return float(value)
@@ -126,18 +128,40 @@ def normalize_row(row: dict[str, Any]) -> dict[str, Any]:
     return {k: normalize_value(v) for k, v in row.items()}
 
 
+def normalize_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [{k: normalize_value(v) for k, v in row.items()} for row in rows]
+
+
 def write_json(path: Path, rows: list[dict[str, Any]]) -> None:
     path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def write_csv(path: Path, columns: list[str], rows: list[dict[str, Any]]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=columns)
+        writer.writeheader()
+        for row in rows:
+            serialized = {}
+            for column in columns:
+                value = row.get(column)
+                if isinstance(value, (dict, list)):
+                    serialized[column] = json.dumps(value, ensure_ascii=False)
+                elif value is None:
+                    serialized[column] = ""
+                else:
+                    serialized[column] = str(value)
+            writer.writerow(serialized)
+
+
 def export_table(conn, table: str, snapshot_dir: Path, latest_dir: Path, dry_run: bool) -> dict[str, Any]:
+    """Stream-export a table using a server-side cursor to avoid loading all rows into RAM."""
     meta_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     columns = get_columns(meta_cur, table)
     meta_cur.close()
     if not columns:
         raise RuntimeError(f"Table '{table}' does not exist or has no columns")
 
-    quoted_columns = ", ".join(f'"{column}"' for column in columns)
+    quoted_columns = ", ".join(f'"{c}"' for c in columns)
     order_by = choose_order(columns)
     sql = f'SELECT {quoted_columns} FROM "{table}"'
     if order_by:
@@ -165,53 +189,51 @@ def export_table(conn, table: str, snapshot_dir: Path, latest_dir: Path, dry_run
         }
 
     row_count = 0
+    # Named server-side cursor: DB sends STREAM_BATCH_SIZE rows per round-trip
     with conn.cursor(f"export_{table}", cursor_factory=psycopg2.extras.RealDictCursor) as stream_cur:
         stream_cur.itersize = STREAM_BATCH_SIZE
         stream_cur.execute(sql)
 
         with (
-            snapshot_json.open("w", encoding="utf-8") as snapshot_json_file,
-            snapshot_csv.open("w", encoding="utf-8", newline="") as snapshot_csv_file,
-            latest_json.open("w", encoding="utf-8") as latest_json_file,
-            latest_csv.open("w", encoding="utf-8", newline="") as latest_csv_file,
+            snapshot_json.open("w", encoding="utf-8") as sjf,
+            snapshot_csv.open("w", encoding="utf-8", newline="") as scf,
+            latest_json.open("w", encoding="utf-8") as ljf,
+            latest_csv.open("w", encoding="utf-8", newline="") as lcf,
         ):
-            csv_writers = [
-                csv.DictWriter(file_handle, fieldnames=columns)
-                for file_handle in (snapshot_csv_file, latest_csv_file)
-            ]
-            for writer in csv_writers:
-                writer.writeheader()
+            csv_writers = [csv.DictWriter(f, fieldnames=columns) for f in (scf, lcf)]
+            for w in csv_writers:
+                w.writeheader()
 
-            for file_handle in (snapshot_json_file, latest_json_file):
-                file_handle.write("[\n")
+            for f in (sjf, ljf):
+                f.write("[\n")
 
             first_row = True
             for raw_row in stream_cur:
                 row = normalize_row(dict(raw_row))
                 row_json = json.dumps(row, ensure_ascii=False)
 
-                for file_handle in (snapshot_json_file, latest_json_file):
+                for f in (sjf, ljf):
                     if not first_row:
-                        file_handle.write(",\n")
-                    file_handle.write(row_json)
+                        f.write(",\n")
+                    f.write(row_json)
 
                 serialized: dict[str, str] = {}
-                for column in columns:
-                    value = row.get(column)
-                    if isinstance(value, (dict, list)):
-                        serialized[column] = json.dumps(value, ensure_ascii=False)
-                    elif value is None:
-                        serialized[column] = ""
+                for col in columns:
+                    val = row.get(col)
+                    if isinstance(val, (dict, list)):
+                        serialized[col] = json.dumps(val, ensure_ascii=False)
+                    elif val is None:
+                        serialized[col] = ""
                     else:
-                        serialized[column] = str(value)
-                for writer in csv_writers:
-                    writer.writerow(serialized)
+                        serialized[col] = str(val)
+                for w in csv_writers:
+                    w.writerow(serialized)
 
                 first_row = False
                 row_count += 1
 
-            for file_handle in (snapshot_json_file, latest_json_file):
-                file_handle.write("\n]")
+            for f in (sjf, ljf):
+                f.write("\n]")
 
     log.info("Exported %s: %d rows", table, row_count)
     return {
@@ -268,11 +290,7 @@ def main() -> None:
         log.warning("[DRY-RUN] DB connection unavailable: %s", exc)
         for table in args.tables:
             manifest["tables"].append(dry_run_plan(table, snapshot_dir, latest_dir))
-        log.info(
-            "[DRY-RUN] Manifest would be written to %s and %s",
-            snapshot_dir / "manifest.json",
-            latest_dir / "manifest.json",
-        )
+        log.info("[DRY-RUN] Manifest would be written to %s and %s", snapshot_dir / "manifest.json", latest_dir / "manifest.json")
         return
 
     try:
@@ -282,11 +300,7 @@ def main() -> None:
         conn.close()
 
     if args.dry_run:
-        log.info(
-            "[DRY-RUN] Manifest would be written to %s and %s",
-            snapshot_dir / "manifest.json",
-            latest_dir / "manifest.json",
-        )
+        log.info("[DRY-RUN] Manifest would be written to %s and %s", snapshot_dir / "manifest.json", latest_dir / "manifest.json")
         return
 
     write_json(snapshot_dir / "manifest.json", manifest)
