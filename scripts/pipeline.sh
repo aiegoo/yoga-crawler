@@ -16,9 +16,12 @@
 #   bash pipeline.sh --sequential            # disable parallelism (for debugging)
 #
 # Parallel execution plan:
-#   Tier 1 (parallel): studios · instructors · associations
+#   Tier 1 (parallel fast): studios · instructors · associations  → DB load immediately after
+#   Tier 1 (parallel slow): classes · instructor_profiles         → DB load after (separate pass)
 #   Tier 1b (serial):  gov_sangga --merge-json   (needs studios_raw.json)
-#   Tier 2 (serial):   db_load                   (needs all JSON files)
+#   Tier 2 (serial):   db_load fast tables       (runs after fast scrapers, ~6 min)
+#   Tier 2b (serial):  studios_dedup             (idempotent)
+#   Tier 2c (serial):  db_load slow tables       (runs after classes finish)
 #   Tier 3 (parallel): scrape_web · scrape_ig_profiles
 #   Tier 4 (scheduled):scrape_github_yoga (weekly) · gov --load-db (monthly)
 # =============================================================================
@@ -107,9 +110,14 @@ $DRY_RUN && DRY_FLAG="--dry-run"
 # ── Parallel job helpers ───────────────────────────────────────────────────────
 
 # Arrays tracking in-flight background jobs
+# Fast group (studios, instructors, associations) — DB load runs after these
 _BG_PIDS=()
 _BG_NAMES=()
 _BG_LOGS=()
+# Slow group (classes, instructor_profiles) — runs in parallel, never blocks DB load
+_BG_SLOW_PIDS=()
+_BG_SLOW_NAMES=()
+_BG_SLOW_LOGS=()
 
 # launch <name> <cmd...>
 # Runs <cmd> in the background with its own log file.
@@ -130,7 +138,24 @@ launch() {
   fi
 }
 
-# collect — wait for all launched background jobs and print results.
+# launch_slow <name> <cmd...>
+# Same as launch but tracked in the slow group — never blocks DB load.
+launch_slow() {
+  local name="$1"; shift
+  local log="$LOG_DIR/${name}-${RUN_ID}.log"
+  if $PARALLEL; then
+    echo "    [bg/slow] $name → $(basename "$log")"
+    (set +e; "$@") >"$log" 2>&1 &
+    _BG_SLOW_PIDS+=("$!")
+    _BG_SLOW_NAMES+=("$name")
+    _BG_SLOW_LOGS+=("$log")
+  else
+    echo "    [seq] $name"
+    "$@" 2>&1 | tee "$log" || true
+  fi
+}
+
+# collect — wait for fast background jobs and print results.
 # Prints last 15 lines of the log for any failed job.
 # Returns 1 if any job failed, 0 if all succeeded.
 collect() {
@@ -150,6 +175,27 @@ collect() {
     fi
   done
   _BG_PIDS=(); _BG_NAMES=(); _BG_LOGS=()
+  return $rc
+}
+
+# collect_slow — wait for slow background jobs (classes, instructor_profiles).
+# Called after DB load so slow scrapers never block the DB update.
+collect_slow() {
+  [[ ${#_BG_SLOW_PIDS[@]} -eq 0 ]] && return 0
+  local rc=0
+  for i in "${!_BG_SLOW_PIDS[@]}"; do
+    local pid="${_BG_SLOW_PIDS[$i]}"
+    local name="${_BG_SLOW_NAMES[$i]}"
+    local log="${_BG_SLOW_LOGS[$i]}"
+    if wait "$pid"; then
+      echo "    ✓ $name: OK"
+    else
+      echo "    ✗ $name: FAILED (slow scraper — DB already updated)"
+      tail -n 5 "$log" | sed 's/^/      /'
+      rc=1
+    fi
+  done
+  _BG_SLOW_PIDS=(); _BG_SLOW_NAMES=(); _BG_SLOW_LOGS=()
   return $rc
 }
 
@@ -224,8 +270,9 @@ if [[ -z "$ONLY" || "$ONLY" == "associations" ]]; then
   "
 fi
 # 1d. GX + private class schedules (Kakao Place, Naver Smart Place, 탈잉, 레슨올)
+# NOTE: slow scraper — runs in background but never blocks DB load
 if [[ -z "$ONLY" || "$ONLY" == "classes" ]]; then
-  launch "classes" bash -c "
+  launch_slow "classes" bash -c "
     set -euo pipefail
     source '$VENV_DIR/bin/activate'
     source /etc/environment 2>/dev/null || true
@@ -245,8 +292,9 @@ if [[ -z "$ONLY" || "$ONLY" == "classes" ]]; then
 fi
 
 # 1e. Instructor profiles (탈잉, 레슨올, 크몽) — supplement Naver Blog profiles
+# NOTE: slow scraper — runs in background but never blocks DB load
 if [[ -z "$ONLY" || "$ONLY" == "instructor_profiles" ]]; then
-  launch "instructor_profiles" bash -c "
+  launch_slow "instructor_profiles" bash -c "
     set -euo pipefail
     source '$VENV_DIR/bin/activate'
     if [[ -n '$INSTRUCTOR_PROFILE_SEED_URL' && -n '$INSTRUCTOR_PROFILE_SEED_FILE' ]]; then
@@ -283,14 +331,16 @@ collect || echo "    Some Tier 1 scrapers failed — continuing to Tier 1b"
 echo ""
 echo ">>> TIER 1b — gov_sangga: SKIPPED (data sourced from CSV download, 51K rows already in DB)"
 
-# ── TIER 2 — DB load (depends on all Tier 1 JSON output) ─────────────────────
+# ── TIER 2 — DB load (fast scrapers: studios · instructors · associations) ───────
+# Runs immediately after fast scrapers finish — does NOT wait for classes/profiles.
 if ! $DRY_RUN && [[ -z "$ONLY" || "$ONLY" == "db" ]]; then
   echo ""
-  echo ">>> TIER 2 — loading all data into PostgreSQL..."
+  echo ">>> TIER 2 — loading fast-scraper data into PostgreSQL..."
   "$PYTHON_BIN" "$SCRIPTS_DIR/db_load.py" \
+    --tables studios instructors associations \
     --data-dir "$DATA_DIR" \
-    && echo "    ✓ db_load: OK" \
-    || echo "    ✗ db_load: FAILED (data still in S3)"
+    && echo "    ✓ db_load (fast): OK" \
+    || echo "    ✗ db_load (fast): FAILED (data still in S3)"
 fi
 
 # ── TIER 2b — deduplicate studios (idempotent; safe to run after every load) ────
@@ -300,6 +350,22 @@ if ! $DRY_RUN && [[ -z "$ONLY" || "$ONLY" == "db" || "$ONLY" == "dedup" ]]; then
   "$PYTHON_BIN" "$SCRIPTS_DIR/studios_dedup.py" \
     && echo "    ✓ dedup: OK" \
     || echo "    ✗ dedup: FAILED (continuing)"
+fi
+
+# ── Wait for slow scrapers (classes, instructor_profiles) ────────────────────────
+echo ""
+echo ">>> Waiting for slow scrapers (classes, instructor_profiles)..."
+collect_slow || echo "    Some slow scrapers failed — DB already updated with fast data"
+
+# ── TIER 2c — second DB load pass for slow scrapers (classes) ────────────────────
+if ! $DRY_RUN && [[ -z "$ONLY" || "$ONLY" == "db" ]]; then
+  echo ""
+  echo ">>> TIER 2c — loading slow-scraper data into PostgreSQL..."
+  "$PYTHON_BIN" "$SCRIPTS_DIR/db_load.py" \
+    --tables classes \
+    --data-dir "$DATA_DIR" \
+    && echo "    ✓ db_load (slow): OK" \
+    || echo "    ✗ db_load (slow): FAILED (continuing)"
 fi
 
 # ── TIER 3 — parallel post-processors (depend on DB) ─────────────────────────
@@ -390,7 +456,8 @@ fi
 if ! $DRY_RUN && [[ "$AUTO_GIT_SYNC" == "true" ]]; then
   echo ""
   echo ">>> Git sync — auto-publishing crawl data to ${GIT_SYNC_BRANCH}..."
-  _PIPELINE_BRANCH=$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo master)
+  _REPO_ROOT="${REPO_ROOT:-$REPO_DIR}"
+  _PIPELINE_BRANCH=$(git -C "$_REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo master)
   "$PYTHON_BIN" "$SCRIPTS_DIR/git_watch.py" \
     --once \
     --branch "$GIT_SYNC_BRANCH" \
@@ -398,7 +465,7 @@ if ! $DRY_RUN && [[ "$AUTO_GIT_SYNC" == "true" ]]; then
     && echo "    ✓ git sync: OK" \
     || echo "    ✗ git sync: FAILED (continuing)"
   # Ensure we are back on the working branch regardless of what git_watch did
-  git -C "$REPO_ROOT" checkout "$_PIPELINE_BRANCH" --quiet 2>/dev/null || true
+  git -C "$_REPO_ROOT" checkout "$_PIPELINE_BRANCH" --quiet 2>/dev/null || true
   echo "    branch restored → $_PIPELINE_BRANCH"
 fi
 

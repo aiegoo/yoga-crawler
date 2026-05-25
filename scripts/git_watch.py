@@ -91,9 +91,11 @@ NEVER_COMMIT: list[str] = [
 # ── Git helpers ───────────────────────────────────────────────────────────────
 
 def git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
+    env = os.environ.copy()
+    env.setdefault("HOME", str(Path.home()))
     return subprocess.run(
         ["git", "-C", str(REPO_ROOT)] + args,
-        capture_output=True, text=True, check=check
+        capture_output=True, text=True, check=check, env=env
     )
 
 
