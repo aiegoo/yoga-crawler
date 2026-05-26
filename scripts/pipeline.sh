@@ -385,9 +385,11 @@ if ! $DRY_RUN; then
   fi
 
   if [[ -z "$ONLY" || "$ONLY" == "instagram" || "$ONLY" == "ig" ]]; then
-    IG_MODE="oembed"
-    [[ -n "${INSTAGRAM_SESSION_ID:-}" ]] && IG_MODE="instaloader"
-    [[ -n "${APIFY_TOKEN:-}" ]]          && IG_MODE="apify"
+    if [[ -z "${APIFY_TOKEN:-}" ]]; then
+      echo "    ✗ APIFY_TOKEN missing — Instagram stage is mandatory and must run via Apify"
+      exit 2
+    fi
+    IG_MODE="apify"
     launch "scrape_ig" bash -c "
       set -euo pipefail
       source '$VENV_DIR/bin/activate'

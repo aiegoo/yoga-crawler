@@ -223,6 +223,108 @@ def _extract_kakao_candidate_image_urls(soup: BeautifulSoup, html_text: str) -> 
     return out
 
 
+def _extract_image_urls_from_obj(obj: Any, out: set[str]) -> None:
+    """Recursively collect image URLs from arbitrary JSON-like payloads."""
+    if isinstance(obj, dict):
+        for v in obj.values():
+            _extract_image_urls_from_obj(v, out)
+        return
+    if isinstance(obj, list):
+        for v in obj:
+            _extract_image_urls_from_obj(v, out)
+        return
+    if isinstance(obj, str):
+        s = obj.strip().replace("\\/", "/")
+        if re.match(r"^https?://", s, re.I) and re.search(r"\.(jpg|jpeg|png|webp)(\?|$)", s, re.I):
+            out.add(s)
+
+
+def _discover_kakao_image_urls_playwright(source_id: str) -> list[str]:
+    """Discover Kakao place image URLs by intercepting browser network traffic.
+
+    Kakao pages often hydrate photo data via async calls not present in server HTML.
+    """
+    if not _pw_available():
+        return []
+
+    from playwright.sync_api import sync_playwright
+
+    page_url = f"https://place.map.kakao.com/{source_id}"
+    found: set[str] = set()
+
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(
+            headless=True,
+            executable_path=_chromium_executable(),
+            args=["--no-sandbox", "--disable-dev-shm-usage"],
+        )
+        ctx = browser.new_context(user_agent=UA, locale="ko-KR", viewport={"width": 1280, "height": 960})
+        page = ctx.new_page()
+
+        def handle_response(resp):
+            try:
+                ct = (resp.headers.get("content-type") or "").lower()
+                if resp.status != 200:
+                    return
+
+                # Capture direct image responses.
+                if "image/" in ct and re.search(r"\.(jpg|jpeg|png|webp)(\?|$)", resp.url, re.I):
+                    found.add(resp.url)
+                    return
+
+                # Capture JSON payloads and recurse for image URLs.
+                if "json" in ct:
+                    payload = resp.json()
+                    _extract_image_urls_from_obj(payload, found)
+                    return
+
+                # Some endpoints return JS/text with escaped URLs.
+                if "text/" in ct or "javascript" in ct:
+                    txt = resp.text()
+                    for m in re.finditer(r'https?://[^"\\\']+\\.(?:jpg|jpeg|png|webp)(?:\?[^"\\\']*)?', txt, re.I):
+                        found.add(m.group(0).replace("\\/", "/"))
+            except Exception:
+                pass
+
+        page.on("response", handle_response)
+
+        try:
+            page.goto(page_url, wait_until="load", timeout=30000)
+            page.wait_for_timeout(2500)
+
+            # Attempt to open photo tab/section to force photo API calls.
+            photo_selectors = [
+                "a:has-text('사진')",
+                "button:has-text('사진')",
+                "a[href*='photo']",
+                "a[href*='review']",
+            ]
+            for sel in photo_selectors:
+                try:
+                    el = page.query_selector(sel)
+                    if el:
+                        el.click(timeout=1000)
+                        page.wait_for_timeout(1500)
+                except Exception:
+                    continue
+
+            # Also parse final DOM for embedded image URLs.
+            html = page.content()
+            for m in re.finditer(r'https?://[^"\\\']+\\.(?:jpg|jpeg|png|webp)(?:\?[^"\\\']*)?', html, re.I):
+                found.add(m.group(0).replace("\\/", "/"))
+        finally:
+            page.close()
+            ctx.close()
+            browser.close()
+
+    out: list[str] = []
+    for u in sorted(found):
+        host = (urlparse(u).netloc or "").lower()
+        if any(h in host for h in ("kakaocdn.net", "kakao.com", "daumcdn.net", "dn-")):
+            out.append(u)
+    return out
+
+
 def scrape_kakao_schedule_images(source_id: str, studio_id: int, studio_name: str,
                                  client: httpx.Client, delay: float) -> list[dict[str, Any]]:
     """OCR schedule-like images from a Kakao place page.
@@ -239,6 +341,14 @@ def scrape_kakao_schedule_images(source_id: str, studio_id: int, studio_name: st
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         image_urls = _extract_kakao_candidate_image_urls(soup, r.text)
+
+        # Mandatory: capture async photo payloads loaded in browser runtime.
+        pw_urls = _discover_kakao_image_urls_playwright(source_id)
+        if pw_urls:
+            image_urls.extend(pw_urls)
+            # Keep deterministic order while deduping.
+            image_urls = list(dict.fromkeys(image_urls))
+
         if not image_urls:
             return []
 
