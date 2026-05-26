@@ -172,6 +172,11 @@ APIFY_IG_ACTOR = "apify/instagram-scraper"
 APIFY_BASE = "https://api.apify.com/v2"
 
 
+def _apify_actor_path(actor_id: str) -> str:
+    # Apify REST endpoints expect actor ID as user~actor-name in the URL path.
+    return actor_id.replace("/", "~")
+
+
 def apify_run_profiles(handles: list[str], post_limit: int = 5) -> list[dict]:
     """
     Run the Apify Instagram Scraper on a list of handles.
@@ -190,9 +195,11 @@ def apify_run_profiles(handles: list[str], post_limit: int = 5) -> list[dict]:
         "addParentData": False,
     }
 
+    actor_path = _apify_actor_path(APIFY_IG_ACTOR)
+
     log.info("Apify: starting actor run for %d profiles...", len(handles))
     resp = httpx.post(
-        f"{APIFY_BASE}/acts/{APIFY_IG_ACTOR}/runs",
+        f"{APIFY_BASE}/acts/{actor_path}/runs",
         headers={"Authorization": f"Bearer {APIFY_TOKEN}"},
         json={"runInput": run_input},
         timeout=30,
