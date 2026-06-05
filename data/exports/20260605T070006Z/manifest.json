@@ -1,6 +1,6 @@
 {
-  "exported_at": "2026-06-05T05:30:04.613815+00:00",
-  "snapshot": "20260605T053004Z",
+  "exported_at": "2026-06-05T07:00:06.219295+00:00",
+  "snapshot": "20260605T070006Z",
   "tables": [
     {
       "table": "studios",
@@ -39,8 +39,8 @@
         "rag_payload",
         "enriched_at"
       ],
-      "snapshot_json": "data/exports/20260605T053004Z/studios.json",
-      "snapshot_csv": "data/exports/20260605T053004Z/studios.csv",
+      "snapshot_json": "data/exports/20260605T070006Z/studios.json",
+      "snapshot_csv": "data/exports/20260605T070006Z/studios.csv",
       "latest_json": "data/exports/latest/studios.json",
       "latest_csv": "data/exports/latest/studios.csv"
     },
@@ -72,8 +72,8 @@
         "rag_payload",
         "enriched_at"
       ],
-      "snapshot_json": "data/exports/20260605T053004Z/instructors.json",
-      "snapshot_csv": "data/exports/20260605T053004Z/instructors.csv",
+      "snapshot_json": "data/exports/20260605T070006Z/instructors.json",
+      "snapshot_csv": "data/exports/20260605T070006Z/instructors.csv",
       "latest_json": "data/exports/latest/instructors.json",
       "latest_csv": "data/exports/latest/instructors.csv"
     },
@@ -99,8 +99,8 @@
         "crawled_at",
         "search_vec"
       ],
-      "snapshot_json": "data/exports/20260605T053004Z/classes.json",
-      "snapshot_csv": "data/exports/20260605T053004Z/classes.csv",
+      "snapshot_json": "data/exports/20260605T070006Z/classes.json",
+      "snapshot_csv": "data/exports/20260605T070006Z/classes.csv",
       "latest_json": "data/exports/latest/classes.json",
       "latest_csv": "data/exports/latest/classes.csv"
     }
